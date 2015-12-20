@@ -1,0 +1,169 @@
+object frmUIDemo: TfrmUIDemo
+  Left = 0
+  Top = 0
+  Caption = 'UI Demo'
+  ClientHeight = 480
+  ClientWidth = 640
+  StyleLookup = 'panelstyle'
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  DesignerMasterStyle = 0
+  object ToolBar1: TToolBar
+    Size.Width = 640.000000000000000000
+    Size.Height = 48.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object Layout3: TLayout
+      Align = Right
+      Margins.Right = 10.000000000000000000
+      Position.X = 580.000000000000000000
+      Size.Width = 50.000000000000000000
+      Size.Height = 48.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      object btnRefresh: TButton
+        Align = Client
+        Size.Width = 50.000000000000000000
+        Size.Height = 48.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'refreshtoolbutton'
+        TabOrder = 0
+        Text = 'btnTrash'
+        OnClick = btnRefreshClick
+      end
+    end
+    object Label3: TLabel
+      Align = Left
+      AutoSize = True
+      StyledSettings = [Family, Size, Style]
+      Padding.Left = 10.000000000000000000
+      Padding.Right = 50.000000000000000000
+      Margins.Left = 10.000000000000000000
+      Margins.Right = 10.000000000000000000
+      Position.X = 12.000000000000000000
+      Scale.X = 1.200000047683716000
+      Scale.Y = 1.200000047683716000
+      Size.Width = 117.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.FontColor = claDarkblue
+      TextSettings.HorzAlign = Center
+      TextSettings.WordWrap = False
+      Text = 'openweathermap.org'
+    end
+  end
+  object TabControl1: TTabControl
+    Align = Client
+    Padding.Left = 10.000000000000000000
+    Padding.Top = 10.000000000000000000
+    Padding.Right = 10.000000000000000000
+    Padding.Bottom = 10.000000000000000000
+    Size.Width = 640.000000000000000000
+    Size.Height = 432.000000000000000000
+    Size.PlatformDefault = False
+    TabIndex = 0
+    TabOrder = 4
+    TabPosition = PlatformDefault
+    object tiWeather: TTabItem
+      CustomIcon = <
+        item
+        end>
+      IsSelected = True
+      Size.Width = 65.000000000000000000
+      Size.Height = 26.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = ''
+      TabOrder = 0
+      Text = 'Weather'
+      ExplicitSize.cx = 65.000000000000000000
+      ExplicitSize.cy = 26.000000000000000000
+      object lbxWeather: TListBox
+        Align = Client
+        Scale.X = 1.200000047683716000
+        Scale.Y = 1.200000047683716000
+        Size.Width = 516.666625976562500000
+        Size.Height = 281.666656494140600000
+        Size.PlatformDefault = False
+        StyleLookup = 'transparentlistboxstyle'
+        TabOrder = 1
+        DisableFocusEffect = True
+        DefaultItemStyles.ItemStyle = ''
+        DefaultItemStyles.GroupHeaderStyle = ''
+        DefaultItemStyles.GroupFooterStyle = ''
+        Viewport.Width = 516.700000000000000000
+        Viewport.Height = 281.700000000000000000
+      end
+      object cboLocation: TComboBox
+        Align = Top
+        Items.Strings = (
+          'Melbourne'
+          'London'
+          'Tokyo')
+        ItemIndex = 0
+        Margins.Bottom = 10.000000000000000000
+        Scale.X = 1.500000000000000000
+        Scale.Y = 1.500000000000000000
+        Size.Width = 413.333343505859400000
+        Size.Height = 22.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+      end
+    end
+    object tiDebug: TTabItem
+      CustomIcon = <
+        item
+        end>
+      IsSelected = False
+      Size.Width = 55.000000000000000000
+      Size.Height = 26.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = ''
+      TabOrder = 0
+      Text = 'Debug'
+      ExplicitSize.cx = 55.000000000000000000
+      ExplicitSize.cy = 26.000000000000000000
+      object Memo1: TMemo
+        Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+        DataDetectorTypes = []
+        TextSettings.WordWrap = True
+        Align = Client
+        ControlType = Platform
+        Margins.Left = 10.000000000000000000
+        Margins.Top = 10.000000000000000000
+        Margins.Right = 10.000000000000000000
+        Margins.Bottom = 10.000000000000000000
+        Size.Width = 30.000000000000000000
+        Size.Height = 30.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        Viewport.Width = 26.000000000000000000
+        Viewport.Height = 26.000000000000000000
+      end
+    end
+  end
+  object RESTClient: TRESTClient
+    Accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+    BaseURL = 
+      'http://api.openweathermap.org/data/2.5/weather?q=London&APPID=24' +
+      'fdfebe24ee484cd7d2081c74b3bba5'
+    Params = <>
+    HandleRedirects = True
+    Left = 192
+    Top = 108
+  end
+  object RESTRequest: TRESTRequest
+    Client = RESTClient
+    Params = <>
+    Response = RESTResponse
+    SynchronizedEvents = False
+    Left = 264
+    Top = 108
+  end
+  object RESTResponse: TRESTResponse
+    Left = 344
+    Top = 108
+  end
+end
