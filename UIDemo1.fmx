@@ -13,7 +13,7 @@ object frmUIDemo: TfrmUIDemo
   DesignerMasterStyle = 0
   object ToolBar1: TToolBar
     Size.Width = 640.000000000000000000
-    Size.Height = 48.000000000000000000
+    Size.Height = 54.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 0
     object Layout3: TLayout
@@ -21,13 +21,13 @@ object frmUIDemo: TfrmUIDemo
       Margins.Right = 10.000000000000000000
       Position.X = 580.000000000000000000
       Size.Width = 50.000000000000000000
-      Size.Height = 48.000000000000000000
+      Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 1
       object btnRefresh: TButton
         Align = Client
         Size.Width = 50.000000000000000000
-        Size.Height = 48.000000000000000000
+        Size.Height = 54.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'refreshtoolbutton'
         TabOrder = 0
@@ -47,7 +47,7 @@ object frmUIDemo: TfrmUIDemo
       Scale.X = 1.200000047683716000
       Scale.Y = 1.200000047683716000
       Size.Width = 117.000000000000000000
-      Size.Height = 40.000000000000000000
+      Size.Height = 45.000000000000000000
       Size.PlatformDefault = False
       TextSettings.FontColor = claDarkblue
       TextSettings.HorzAlign = Center
@@ -62,7 +62,7 @@ object frmUIDemo: TfrmUIDemo
     Padding.Right = 10.000000000000000000
     Padding.Bottom = 10.000000000000000000
     Size.Width = 640.000000000000000000
-    Size.Height = 432.000000000000000000
+    Size.Height = 426.000000000000000000
     Size.PlatformDefault = False
     TabIndex = 0
     TabOrder = 4
@@ -85,7 +85,7 @@ object frmUIDemo: TfrmUIDemo
         Scale.X = 1.200000047683716000
         Scale.Y = 1.200000047683716000
         Size.Width = 516.666625976562500000
-        Size.Height = 281.666656494140600000
+        Size.Height = 276.666656494140600000
         Size.PlatformDefault = False
         StyleLookup = 'transparentlistboxstyle'
         TabOrder = 1
@@ -94,7 +94,7 @@ object frmUIDemo: TfrmUIDemo
         DefaultItemStyles.GroupHeaderStyle = ''
         DefaultItemStyles.GroupFooterStyle = ''
         Viewport.Width = 516.700000000000000000
-        Viewport.Height = 281.700000000000000000
+        Viewport.Height = 276.700000000000000000
       end
       object cboLocation: TComboBox
         Align = Top

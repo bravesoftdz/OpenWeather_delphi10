@@ -1,0 +1,11 @@
+*.dcu
+\Android\
+*.~1~
+*.vsr
+*.so
+*.png
+Android/Release/OpenWeatherDelphi/library/lib/armeabi-v7a/gdbserver
+*.dex
+*.apk
+*.xml
+*.o
