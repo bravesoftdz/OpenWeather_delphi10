@@ -4,8 +4,10 @@
 *.vsr
 *.so
 *.png
-Android/Release/OpenWeatherDelphi/library/lib/armeabi-v7a/gdbserver
+Android/
 *.dex
 *.apk
 *.xml
 *.o
+*.~*
+*.exe

@@ -8,7 +8,8 @@ uses
   FMX.StdCtrls, FMX.Controls.Presentation, FMX.Edit, FMX.ScrollBox, FMX.Memo,
   IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP, System.JSON,
   IPPeerClient, REST.Client, Data.Bind.Components, Data.Bind.ObjectScope, classOpenWeather,
-  FMX.TabControl, FMX.ListBox;
+  FMX.TabControl, FMX.ListBox, FMX.ListView.Types, FMX.ListView.Appearances,
+  FMX.ListView.Adapters.Base, FMX.ListView, FMX.Objects;
 
 type
   TfrmUIDemo = class(TForm)
@@ -23,8 +24,10 @@ type
     tiDebug: TTabItem;
     Memo1: TMemo;
     Label3: TLabel;
-    lbxWeather: TListBox;
     cboLocation: TComboBox;
+    lbxWeather: TListView;
+    Image1: TImage;
+    btnLoadCities: TButton;
     procedure btnRefreshClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -65,6 +68,7 @@ end;
 
 procedure TfrmUIDemo.btnRefreshClick(Sender: TObject);
 var _responce: string;
+    LItem: TListViewItem;
 begin
 // API key: 24fdfebe24ee484cd7d2081c74b3bba5
 // api.openweathermap.org/data/2.5/forecast/city?id=524901&APPID=24fdfebe24ee484cd7d2081c74b3bba5
@@ -89,6 +93,11 @@ begin
   OpenWeatherItem.loadFromJsonData(_responce);
   Memo1.Lines.Assign(OpenWeatherItem.debug_text);
   lbxWeather.Items.Clear;
+
+  LItem:= lbxWeather.Items.Add;
+  LItem.Text:= OpenWeatherItem.name;
+  LItem.Bitmap:=  Image1.Bitmap;
+  (*
   lbxWeather.Items.Add(OpenWeatherItem.name);
   lbxWeather.Items.Add(OpenWeatherItem.description);
   lbxWeather.Items.Add('Current Temp: '+OpenWeatherItem.temp);
@@ -101,7 +110,7 @@ begin
   lbxWeather.Items.Add('Wind Direction: '+OpenWeatherItem.wind_deg);
   lbxWeather.Items.Add('Lat: '+OpenWeatherItem.lat);
   lbxWeather.Items.Add('Lon: '+OpenWeatherItem.lon);
-
+   *)
 
 end;
 
