@@ -39,7 +39,9 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure lbxWeatherDblClick(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
   private
+    OnActivateDone: boolean;
     OpenWeatherItem: TOpenWeatherItem;
     function  GetPage(aURL: string): string;
     function  get_utc_time: TDateTime;
@@ -240,10 +242,18 @@ begin
 
 end;
 
+procedure TfrmUIDemo.FormActivate(Sender: TObject);
+begin
+    if OnActivateDone then
+      exit;
+    btnRefreshClick(Sender);
+    OnActivateDone:= true;
+end;
+
 procedure TfrmUIDemo.FormCreate(Sender: TObject);
 begin
+  OnActivateDone:= false;
   OpenWeatherItem:= TOpenWeatherItem.Create;
-   btnRefreshClick(Sender);
 end;
 
 procedure TfrmUIDemo.FormDestroy(Sender: TObject);

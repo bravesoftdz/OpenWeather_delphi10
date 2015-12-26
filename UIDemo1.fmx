@@ -8,6 +8,7 @@ object frmUIDemo: TfrmUIDemo
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
+  OnActivate = FormActivate
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   DesignerMasterStyle = 0
@@ -189,7 +190,7 @@ object frmUIDemo: TfrmUIDemo
           Margins.Bottom = 10.000000000000000000
           Scale.X = 1.500000000000000000
           Scale.Y = 1.500000000000000000
-          Size.Width = 324.666687011718700000
+          Size.Width = 324.666687011718800000
           Size.Height = 23.333333969116210000
           Size.PlatformDefault = False
           TabOrder = 1
