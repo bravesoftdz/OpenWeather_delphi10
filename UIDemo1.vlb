@@ -25,23 +25,10 @@ Coordinates=236,364,85,36
 [tiDebug]
 Coordinates=167,364,59,36
 
-[cboLocation]
-Coordinates=243,10,101,146
-
 [Layout3]
 Coordinates=97,364,60,36
 
-[Label3]
-Coordinates=619,10,53,58
-
-[lbxWeather]
-Coordinates=126,10,107,168
-Visible=True
-
-[Image1]
-Coordinates=552,10,57,58
-Visible=True
-
 []
-Coordinates=135,197,91,36
+Coordinates=619,10,53,58
+Visible=True
 

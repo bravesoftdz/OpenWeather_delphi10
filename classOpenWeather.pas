@@ -8,6 +8,7 @@ type
 TOpenWeatherItem = class
   name: string;
   country: string;
+  cod: string;
   id: string;
   temp: string;
   pressure: string;
@@ -15,6 +16,7 @@ TOpenWeatherItem = class
   temp_min: string;
   temp_max: string;
   main: string;
+  icon: string;
   description: string;
   lon: string;
   lat: string;
@@ -49,12 +51,14 @@ procedure TOpenWeatherItem.clean;
 begin
     name:= StringReplace(name, '"', '',[rfReplaceAll, rfIgnoreCase]);
     country:= StringReplace(country, '"', '',[rfReplaceAll, rfIgnoreCase]);
+    cod:= StringReplace(cod, '"', '',[rfReplaceAll, rfIgnoreCase]);
     id:= StringReplace(id, '"', '',[rfReplaceAll, rfIgnoreCase]);
     pressure:= StringReplace(pressure, '"', '',[rfReplaceAll, rfIgnoreCase]);
     humidity:= StringReplace(humidity, '"', '',[rfReplaceAll, rfIgnoreCase]);
     temp_min:= StringReplace(temp_min, '"', '',[rfReplaceAll, rfIgnoreCase]);
     temp_max:= StringReplace(temp_max, '"', '',[rfReplaceAll, rfIgnoreCase]);
     main:= StringReplace(main, '"', '',[rfReplaceAll, rfIgnoreCase]);
+    icon:= StringReplace(icon, '"', '',[rfReplaceAll, rfIgnoreCase]);
     description:= StringReplace(description, '"', '',[rfReplaceAll, rfIgnoreCase]);
     lon:= StringReplace(lon, '"', '',[rfReplaceAll, rfIgnoreCase]);
     lat:= StringReplace(lat, '"', '',[rfReplaceAll, rfIgnoreCase]);
@@ -70,6 +74,7 @@ procedure TOpenWeatherItem.clear;
 begin
   name:= '';
   country:= '';
+  cod:= '';
   id:= '';
   temp:= '';
   pressure:= '';
@@ -77,6 +82,7 @@ begin
   temp_min:= '';
   temp_max:= '';
   main:= '';
+  icon:= '';
   description:= '';
   lon:= '';
   lat:= '';
@@ -147,6 +153,9 @@ begin
       if _JSONPair <> Nil  then  country:=  _JSONPair.JSONValue.ToSTring;
       _JSONPair := _JSONObject.Get('country');
       if _JSONPair <> Nil  then  country:=  _JSONPair.JSONValue.ToSTring;
+      _JSONPair := _JSONObject.Get('cod');
+      if _JSONPair <> Nil  then  cod:=  _JSONPair.JSONValue.ToSTring;
+
       _JSONPair := _JSONObject.Get('id');
       if _JSONPair <> Nil  then  id:=  _JSONPair.JSONValue.ToSTring;
       _JSONPair := _JSONObject.Get('temp');
@@ -161,6 +170,11 @@ begin
       if _JSONPair <> Nil  then  temp_max:=  _JSONPair.JSONValue.ToSTring;
       _JSONPair := _JSONObject.Get('main');
       if _JSONPair <> Nil  then  main:=  _JSONPair.JSONValue.ToSTring;
+
+       _JSONPair := _JSONObject.Get('icon');
+      if _JSONPair <> Nil  then  icon:=  _JSONPair.JSONValue.ToSTring;
+
+
       _JSONPair := _JSONObject.Get('description');
       if _JSONPair <> Nil  then  description:=  _JSONPair.JSONValue.ToSTring;
       _JSONPair := _JSONObject.Get('lon');

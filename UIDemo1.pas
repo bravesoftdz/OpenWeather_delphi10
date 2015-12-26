@@ -9,7 +9,9 @@ uses
   IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP, System.JSON,
   IPPeerClient, REST.Client, Data.Bind.Components, Data.Bind.ObjectScope, classOpenWeather,
   FMX.TabControl, FMX.ListBox, FMX.ListView.Types, FMX.ListView.Appearances,
-  FMX.ListView.Adapters.Base, FMX.ListView, FMX.Objects;
+  FMX.ListView.Adapters.Base, FMX.ListView, FMX.Objects, System.ImageList,
+  FMX.ImgList, IdIOHandler, IdIOHandlerSocket, IdIOHandlerStack, IdSSL,
+  IdSSLOpenSSL;
 
 type
   TfrmUIDemo = class(TForm)
@@ -23,18 +25,25 @@ type
     tiWeather: TTabItem;
     tiDebug: TTabItem;
     Memo1: TMemo;
-    Label3: TLabel;
-    cboLocation: TComboBox;
+    imgCross: TImage;
     lbxWeather: TListView;
-    Image1: TImage;
-    btnLoadCities: TButton;
+    imgArrow: TImage;
+    ImageList1: TImageList;
+    Layout1: TLayout;
+    cboLocation: TComboBox;
+    imgWeather: TImage;
+    Rectangle1: TRectangle;
+    Label1: TLabel;
+    IdHTTP1: TIdHTTP;
     procedure btnRefreshClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure lbxWeatherDblClick(Sender: TObject);
   private
     OpenWeatherItem: TOpenWeatherItem;
-
-    function GetPage(aURL: string): string;
+    function  GetPage(aURL: string): string;
+    function  get_utc_time: TDateTime;
+    function get_local_time(_lat, _lon: string): TDateTime;
   public
     { Public declarations }
   end;
@@ -46,39 +55,110 @@ implementation
 
 {$R *.fmx}
 
+const
+  sThumbNailName = 'TI';
+  sCaption = 'CA';
+
+
 function  TfrmUIDemo.GetPage(aURL: string): string;
 var
   Response: TStringStream;
+   LHandler: TIdSSLIOHandlerSocketOpenSSL;
 begin
-(*
-  Result := '';
-  Response := TStringStream.Create('');
+ Result:= '';
+ Response := TStringStream.Create('');
   try
     IdHTTP1.Get(aURL, Response);
     if IdHTTP1.ResponseCode = 200 then begin
       Result := Response.DataString;
     end else begin
-      // Nothing returned or error
+       Result := '';
     end;
   finally
     Response.Free;
   end;
-*)
 end;
+
+function  TfrmUIDemo.get_utc_time: TDateTime;
+var
+  Response: TStringStream;
+  _UTC_Time: string;
+  // http://www.timeapi.org/utc/now
+    // 2015-12-26T06:19:44+00:00
+begin
+  Result:= 0;
+  _UTC_Time := GetPage('http://www.timeapi.org/utc/now');
+  if length(_UTC_Time) = 25  then begin //2015-12-26T06:19:44+00:00
+     Result:= EncodeDate(
+                 StrToIntDef(copy(_UTC_Time,1,4),1970),
+                 StrToIntDef(copy(_UTC_Time,6,2),1),
+                 StrToIntDef(copy(_UTC_Time,9,2),1));
+     Result:= trunc(Result);
+     Result:= Result+ EncodeTime(
+                        StrToIntDef(copy(_UTC_Time,12,2),1),
+                        StrToIntDef(copy(_UTC_Time,15,2),1),
+                        StrToIntDef(copy(_UTC_Time,18,2),1),0);
+
+  end;
+end;
+
+function TfrmUIDemo.get_local_time(_lat, _lon: string): TDateTime;
+//https://maps.googleapis.com/maps/api/timezone/json?location=-37.81,144.96&timestamp=0&key=AIzaSyB24zZQrfu8dNsF4sn2LIXa5glDiS9Q5Jk
+(*
+{
+   "dstOffset" : 3600,
+   "rawOffset" : 36000,
+   "status" : "OK",
+   "timeZoneId" : "Australia/Hobart",
+   "timeZoneName" : "Australian Eastern Daylight Time"
+}
+*)
+const ONE_SECOND = 1/24/60/60;
+var  _JSONObject: TJSONObject;
+     _json_data: string;
+     _url: string;
+     _ParseResult: integer;
+     _JSONPair: TJSONPair;
+     _dstOffset: integer;
+     _rawOffset: integer;
+     _UTC_time: TDateTime;
+begin
+  _UTC_time:=  get_utc_time;
+   Result:= _UTC_time;
+  _url:= format('https://maps.googleapis.com/maps/api/timezone/json?location=%s,%s&timestamp=0&key=AIzaSyB24zZQrfu8dNsF4sn2LIXa5glDiS9Q5Jk',
+         [_lat, _lon]);
+  RESTClient.BaseURL :=  _url;
+  RESTRequest.Resource := '';
+  RESTRequest.Execute;
+  _json_data:= RESTResponse.Content;
+  //_json_data:=   GetPage(_url);
+  if _json_data <> '' then
+  try
+      _JSONObject:=  TJSONObject.Create;
+      _ParseResult := _JSONObject.Parse(BytesOf(_json_data ),0);
+      _JSONPair := _JSONObject.Get('rawOffset');  //rawOffset       dstOffset
+      if _JSONPair <> Nil  then  _rawOffset:=  StrToIntDef(_JSONPair.JSONValue.ToString,0);
+      _JSONPair := _JSONObject.Get('dstOffset');  //rawOffset       dstOffset
+      if _JSONPair <> Nil  then  _dstOffset:=  StrToIntDef(_JSONPair.JSONValue.ToString,0);
+      Result:= _UTC_time+_rawOffset*ONE_SECOND+_dstOffset*ONE_SECOND;
+  finally
+      _JSONObject.Free;
+  end;
+end;
+
 
 procedure TfrmUIDemo.btnRefreshClick(Sender: TObject);
 var _responce: string;
-    LItem: TListViewItem;
+    _Item: TListViewItem;
+    _BitMap: TBitMap;
+    _Size: TSize;
+    _ListItemImage: TListItemImage;
+    _BitmapItem: TBitmapItem;
+    _localTime: TDateTime;
+    _hoursAgo: double;
+    //https://maps.googleapis.com/maps/api/timezone/json?location=-37.81,144.96&timestamp=0&key=AIzaSyB24zZQrfu8dNsF4sn2LIXa5glDiS9Q5Jk
+
 begin
-// API key: 24fdfebe24ee484cd7d2081c74b3bba5
-// api.openweathermap.org/data/2.5/forecast/city?id=524901&APPID=24fdfebe24ee484cd7d2081c74b3bba5
-//api.openweathermap.org/data/2.5/weather?lat=35&lon=1391&APPID=24fdfebe24ee484cd7d2081c74b3bba5
-//api.openweathermap.org/data/2.5/weather?q=London&APPID=24fdfebe24ee484cd7d2081c74b3bba5
-  //s:=  GetPage('http://api.openweathermap.org/data/2.5/weather?q=London&APPID=24fdfebe24ee484cd7d2081c74b3bba5');
-  //Memo1.Lines.Clear;
-  //Memo1.Lines.Add(s);
-  // lat=35&lon=139
-//  RESTClient.BaseURL := 'http://api.openweathermap.org/data/2.5/weather??lat=35&lon=139&units=metric&APPID=24fdfebe24ee484cd7d2081c74b3bba5';
   case cboLocation.ItemIndex of
     0: RESTClient.BaseURL := 'http://api.openweathermap.org/data/2.5/weather?q=Melbourne,au&units=metric&APPID=24fdfebe24ee484cd7d2081c74b3bba5';
     1: RESTClient.BaseURL := 'http://api.openweathermap.org/data/2.5/weather?q=London,gb&units=metric&APPID=24fdfebe24ee484cd7d2081c74b3bba5';
@@ -86,42 +166,94 @@ begin
   else
      exit;
   end;
+
   RESTRequest.Resource := '';
   RESTRequest.Execute;
   _responce:= RESTResponse.Content;
 
   OpenWeatherItem.loadFromJsonData(_responce);
+  _localTime:= get_local_time(OpenWeatherItem.lat, OpenWeatherItem.lon);
+  _hoursAgo:= (_localTime-  OpenWeatherItem.last_updated) *24;
   Memo1.Lines.Assign(OpenWeatherItem.debug_text);
+  Memo1.Lines.Insert(0,'Local TIme: '+DateTimeToStr(_localTime));
   lbxWeather.Items.Clear;
 
-  LItem:= lbxWeather.Items.Add;
-  LItem.Text:= OpenWeatherItem.name;
-  LItem.Bitmap:=  Image1.Bitmap;
-  (*
-  lbxWeather.Items.Add(OpenWeatherItem.name);
-  lbxWeather.Items.Add(OpenWeatherItem.description);
-  lbxWeather.Items.Add('Current Temp: '+OpenWeatherItem.temp);
-  lbxWeather.Items.Add('Max Temp: '+OpenWeatherItem.temp_max);
-  lbxWeather.Items.Add('Min Temp: '+OpenWeatherItem.temp_min);
-  lbxWeather.Items.Add('Last Update: '+FormatDateTime('dd/mm/yy hh:nn am/pm',OpenWeatherItem.last_updated));
-  lbxWeather.Items.Add('Pressure: '+OpenWeatherItem.pressure);
-  lbxWeather.Items.Add('Humidity: '+OpenWeatherItem.humidity);
-  lbxWeather.Items.Add('Wind Speed: '+OpenWeatherItem.wind_speed);
-  lbxWeather.Items.Add('Wind Direction: '+OpenWeatherItem.wind_deg);
-  lbxWeather.Items.Add('Lat: '+OpenWeatherItem.lat);
-  lbxWeather.Items.Add('Lon: '+OpenWeatherItem.lon);
+ // _Item:= lbxWeather.Items.Add;
+ // _Item.Text:= '            '+OpenWeatherItem.name;
+  _Size.Width:= 24;
+  _Size.Height:= 24;
+  _BitMap:=  ImageList1.Bitmap(_Size,0 );
+  OpenWeatherItem.icon:= lowercase(OpenWeatherItem.icon);
+  if OpenWeatherItem.icon = '01d' then  _BitMap:=  ImageList1.Bitmap(_Size,0 );
+  if OpenWeatherItem.icon = '01n' then  _BitMap:=  ImageList1.Bitmap(_Size,0 );
+  if OpenWeatherItem.icon = '02d' then  _BitMap:=  ImageList1.Bitmap(_Size,1 );
+  if OpenWeatherItem.icon = '02n' then  _BitMap:=  ImageList1.Bitmap(_Size,1 );
+  if OpenWeatherItem.icon = '03d' then  _BitMap:=  ImageList1.Bitmap(_Size,2 );
+  if OpenWeatherItem.icon = '03n' then  _BitMap:=  ImageList1.Bitmap(_Size,2 );
+  if OpenWeatherItem.icon = '04d' then  _BitMap:=  ImageList1.Bitmap(_Size,3 );
+  if OpenWeatherItem.icon = '04n' then  _BitMap:=  ImageList1.Bitmap(_Size,3 );
+  if OpenWeatherItem.icon = '09d' then  _BitMap:=  ImageList1.Bitmap(_Size,4 );
+  if OpenWeatherItem.icon = '09n' then  _BitMap:=  ImageList1.Bitmap(_Size,4 );
+  if OpenWeatherItem.icon = '10d' then  _BitMap:=  ImageList1.Bitmap(_Size,5 );
+  if OpenWeatherItem.icon = '10n' then  _BitMap:=  ImageList1.Bitmap(_Size,5 );
+  if OpenWeatherItem.icon = '11d' then  _BitMap:=  ImageList1.Bitmap(_Size,6 );
+  if OpenWeatherItem.icon = '11n' then  _BitMap:=  ImageList1.Bitmap(_Size,6 );
+  if OpenWeatherItem.icon = '13d' then  _BitMap:=  ImageList1.Bitmap(_Size,7 );
+  if OpenWeatherItem.icon = '13n' then  _BitMap:=  ImageList1.Bitmap(_Size,7 );
+  if OpenWeatherItem.icon = '50d' then  _BitMap:=  ImageList1.Bitmap(_Size,8 );
+  if OpenWeatherItem.icon = '50n' then  _BitMap:=  ImageList1.Bitmap(_Size,8 );
+  imgWeather.Bitmap.Assign(_BitMap);;
+ // _BitMap.SaveToFile('C:\aaa\c.bmp');
+ (*
+  _Item.BitmapRef := _BitMap;//imgCross.Bitmap;
+  _ListItemImage:=  (_Item.Objects.FindDrawable(sThumbNailName) as TListItemImage);
+   if _ListItemImage <> Nil then begin
+      _ListItemImage.OwnsBitmap := False;
+      _ListItemImage.Bitmap := _BitMap;//imgCross.Bitmap;
+   end;
    *)
+  _Item:= lbxWeather.Items.Add;
+  _Item.Text:= OpenWeatherItem.description;
+  _Item:= lbxWeather.Items.Add;
+  _Item.Text:= 'Current Temp: '+OpenWeatherItem.temp;
+  _Item:= lbxWeather.Items.Add;
+  _Item.Text:= 'Wind Speed: '+OpenWeatherItem.wind_speed;
+   _Item:= lbxWeather.Items.Add;
+  _Item.Text:= 'Humidity: '+OpenWeatherItem.humidity;
+  _Item:= lbxWeather.Items.Add;
+  _Item.Text:= 'Local Time: '+FormatDateTime('dd/mm/yy hh:nn am/pm',_localTime);
+
+  _Item:= lbxWeather.Items.Add;
+  _Item.Text:= //' Last Update: '+FormatDateTime('dd/mm/yy hh:nn am/pm   ',OpenWeatherItem.last_updated)+
+               Format('Last Update %f hours ago',[_hoursAgo]);
+  _Item:= lbxWeather.Items.Add;
+  _Item.Text:= 'Lat: '+OpenWeatherItem.lat;
+  _Item:= lbxWeather.Items.Add;
+  _Item.Text:= 'Lon: '+OpenWeatherItem.lon;
+
+  //lbxWeather.Items.Add('Current Temp: '+OpenWeatherItem.temp);
+  //lbxWeather.Items.Add('Max Temp: '+OpenWeatherItem.temp_max);
+  //lbxWeather.Items.Add('Min Temp: '+OpenWeatherItem.temp_min);
+  //lbxWeather.Items.Add('Pressure: '+OpenWeatherItem.pressure);
+  //lbxWeather.Items.Add('Humidity: '+OpenWeatherItem.humidity);
+  //lbxWeather.Items.Add('Wind Direction: '+OpenWeatherItem.wind_deg);
 
 end;
 
 procedure TfrmUIDemo.FormCreate(Sender: TObject);
 begin
   OpenWeatherItem:= TOpenWeatherItem.Create;
+   btnRefreshClick(Sender);
 end;
 
 procedure TfrmUIDemo.FormDestroy(Sender: TObject);
 begin
     OpenWeatherItem.Free;
+end;
+
+procedure TfrmUIDemo.lbxWeatherDblClick(Sender: TObject);
+begin
+  TabControl1.ActiveTab:= tiDebug;
 end;
 
 end.
