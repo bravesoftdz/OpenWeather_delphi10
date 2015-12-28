@@ -14,6 +14,11 @@ uses
   IdSSLOpenSSL;
 
 type
+
+  TJsonDataFromThread = class(TObject)
+    json_data: string;
+  end;
+
   TfrmUIDemo = class(TForm)
     ToolBar1: TToolBar;
     Layout3: TLayout;
@@ -40,9 +45,9 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure lbxWeatherDblClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
-    procedure Memo1Change(Sender: TObject);
   private
     OnActivateDone: boolean;
+    WeatherData: TJsonDataFromThread;
     OpenWeatherItem: TOpenWeatherItem;
     procedure process_new_weather_data(Sender: TObject);
     function  get_utc_time: TDateTime;
@@ -50,16 +55,17 @@ type
   public
   end;
 
+
   TWeatherReaderThread = class(TTHread)
     JSONData: string;
-    Memo: TMemo;
+    WeatherData:  TJsonDataFromThread;
     CityLocation: string;
     RESTClient: TRESTClient;
     RESTRequest: TRESTRequest;
     RESTResponse: TRESTResponse;
     procedure writeToMainThread;
     procedure Execute; override;
-    constructor create (_CityLocation: string; _Memo: TMemo;
+    constructor create (_CityLocation: string; _WeatherData: TJsonDataFromThread;
                         _RESTClient: TRESTClient;_RESTRequest: TRESTRequest; _RESTResponse: TRESTResponse);
   end;
 
@@ -261,7 +267,7 @@ begin
     if OnActivateDone then
       exit;
     OnActivateDone:= true;
-    _WeatherReaderThread:= TWeatherReaderThread.create('Melbourne,au',Memo1,RESTClient,RESTRequest,RESTResponse);
+    _WeatherReaderThread:= TWeatherReaderThread.create('Melbourne,au',WeatherData,RESTClient,RESTRequest,RESTResponse);
     _WeatherReaderThread.OnTerminate:= process_new_weather_data;
     _WeatherReaderThread.Execute;
     _WeatherReaderThread.Free;
@@ -273,12 +279,14 @@ end;
 procedure TfrmUIDemo.FormCreate(Sender: TObject);
 begin
   OnActivateDone:= false;
+  WeatherData:= TJsonDataFromThread.Create;
   OpenWeatherItem:= TOpenWeatherItem.Create;
 end;
 
 procedure TfrmUIDemo.FormDestroy(Sender: TObject);
 begin
     OpenWeatherItem.Free;
+    WeatherData.Free;
 end;
 
 procedure TfrmUIDemo.lbxWeatherDblClick(Sender: TObject);
@@ -288,26 +296,23 @@ end;
 
 
 
-procedure TfrmUIDemo.Memo1Change(Sender: TObject);
-begin
-   Label1.Text:= IntToStr(memo1.Lines.Count);
-end;
-
 procedure TfrmUIDemo.process_new_weather_data(Sender: TObject);
 begin
      Label1.Text:= 'Got New Data from Thread';
+     Memo1.Lines.Clear;
+     Memo1.Lines.Add(weatherdata.json_data);
 end;
 
 { TWeatherReaderThread }
 
-constructor TWeatherReaderThread.create(_CityLocation: string; _Memo: TMemo;
+constructor TWeatherReaderThread.create(_CityLocation: string; _WeatherData: TJsonDataFromThread;
                         _RESTClient: TRESTClient;_RESTRequest: TRESTRequest; _RESTResponse: TRESTResponse);
 begin
    RESTClient:= _RESTClient;
    RESTRequest:= _RESTRequest;
    RESTResponse:= _RESTResponse;
    CityLocation:= _CityLocation;
-   Memo:=    _Memo;
+   WeatherData:=    _WeatherData;
    inherited Create(true);
 end;
 
@@ -323,8 +328,7 @@ end;
 
 procedure TWeatherReaderThread.writeToMainThread;
 begin
-  Memo.Lines.Clear;
-  Memo.Lines.Add(JSONData);
+  WeatherData.json_data:= JSONData;
 end;
 
 end.

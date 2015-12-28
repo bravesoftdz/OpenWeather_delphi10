@@ -93,8 +93,7 @@ object frmUIDemo: TfrmUIDemo
         HeaderAppearanceClassName = 'TListHeaderObjects'
         FooterAppearanceClassName = 'TListHeaderObjects'
         Align = Client
-        Size.Width = 537.000000000000000000
-        Size.Height = 330.000000000000000000
+        Size.Width = 50.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 5
         StyleLookup = 'listviewstyle'
@@ -176,7 +175,7 @@ object frmUIDemo: TfrmUIDemo
       end
       object Layout1: TLayout
         Align = Top
-        Size.Width = 537.000000000000000000
+        Size.Width = 50.000000000000000000
         Size.Height = 50.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 6
@@ -190,7 +189,6 @@ object frmUIDemo: TfrmUIDemo
           Margins.Bottom = 10.000000000000000000
           Scale.X = 1.500000000000000000
           Scale.Y = 1.500000000000000000
-          Size.Width = 324.666687011718800000
           Size.Height = 23.333333969116210000
           Size.PlatformDefault = False
           TabOrder = 1
@@ -339,7 +337,6 @@ object frmUIDemo: TfrmUIDemo
         Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
         DataDetectorTypes = []
         TextSettings.WordWrap = True
-        OnChange = Memo1Change
         Align = Client
         ControlType = Platform
         Margins.Left = 10.000000000000000000
