@@ -40,14 +40,27 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure lbxWeatherDblClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
+    procedure Memo1Change(Sender: TObject);
   private
     OnActivateDone: boolean;
     OpenWeatherItem: TOpenWeatherItem;
-    function  GetPage(aURL: string): string;
+    procedure process_new_weather_data(Sender: TObject);
     function  get_utc_time: TDateTime;
     function get_local_time(_lat, _lon: string): TDateTime;
   public
-    { Public declarations }
+  end;
+
+  TWeatherReaderThread = class(TTHread)
+    JSONData: string;
+    Memo: TMemo;
+    CityLocation: string;
+    RESTClient: TRESTClient;
+    RESTRequest: TRESTRequest;
+    RESTResponse: TRESTResponse;
+    procedure writeToMainThread;
+    procedure Execute; override;
+    constructor create (_CityLocation: string; _Memo: TMemo;
+                        _RESTClient: TRESTClient;_RESTRequest: TRESTRequest; _RESTResponse: TRESTResponse);
   end;
 
 var
@@ -62,34 +75,34 @@ const
   sCaption = 'CA';
 
 
-function  TfrmUIDemo.GetPage(aURL: string): string;
-var
-  Response: TStringStream;
-   LHandler: TIdSSLIOHandlerSocketOpenSSL;
-begin
- Result:= '';
- Response := TStringStream.Create('');
-  try
-    IdHTTP1.Get(aURL, Response);
-    if IdHTTP1.ResponseCode = 200 then begin
-      Result := Response.DataString;
-    end else begin
-       Result := '';
-    end;
-  finally
-    Response.Free;
-  end;
-end;
-
 function  TfrmUIDemo.get_utc_time: TDateTime;
 var
   Response: TStringStream;
-  _UTC_Time: string;
+  _UTC_Time, _url: string;
+  _JSONObject: TJSONObject;
+  _JSONPair: TJSONPair;
+   _ParseResult: integer;
   // http://www.timeapi.org/utc/now
-    // 2015-12-26T06:19:44+00:00
+  // 2015-12-26T06:19:44+00:00
+  //'{"dateString":"2015-12-28T09:49:54+00:00"}'
 begin
   Result:= 0;
-  _UTC_Time := GetPage('http://www.timeapi.org/utc/now');
+  //_UTC_Time := GetPage('http://www.timeapi.org/utc/now');
+  _url:= 'http://www.timeapi.org/utc/now';
+  RESTClient.BaseURL :=  _url;
+  RESTRequest.Resource := '';
+  RESTRequest.Execute;
+  _UTC_Time:= RESTResponse.Content;
+  if _UTC_Time <> '' then
+  try
+      _JSONObject:=  TJSONObject.Create;
+      _ParseResult := _JSONObject.Parse(BytesOf(_UTC_Time ),0);
+      _JSONPair := _JSONObject.Get('dateString');  //rawOffset       dstOffset
+      if _JSONPair <> Nil  then  _UTC_Time:=  _JSONPair.JSONValue.ToString;
+  finally
+      _JSONObject.Free;
+  end;
+  _UTC_Time:= StringReplace(_UTC_Time, '"', '',[rfReplaceAll, rfIgnoreCase]);
   if length(_UTC_Time) = 25  then begin //2015-12-26T06:19:44+00:00
      Result:= EncodeDate(
                  StrToIntDef(copy(_UTC_Time,1,4),1970),
@@ -243,10 +256,17 @@ begin
 end;
 
 procedure TfrmUIDemo.FormActivate(Sender: TObject);
+var _WeatherReaderThread: TWeatherReaderThread;
 begin
     if OnActivateDone then
       exit;
-    btnRefreshClick(Sender);
+    OnActivateDone:= true;
+    _WeatherReaderThread:= TWeatherReaderThread.create('Melbourne,au',Memo1,RESTClient,RESTRequest,RESTResponse);
+    _WeatherReaderThread.OnTerminate:= process_new_weather_data;
+    _WeatherReaderThread.Execute;
+    _WeatherReaderThread.Free;
+
+    //btnRefreshClick(Sender);
     OnActivateDone:= true;
 end;
 
@@ -264,6 +284,47 @@ end;
 procedure TfrmUIDemo.lbxWeatherDblClick(Sender: TObject);
 begin
   TabControl1.ActiveTab:= tiDebug;
+end;
+
+
+
+procedure TfrmUIDemo.Memo1Change(Sender: TObject);
+begin
+   Label1.Text:= IntToStr(memo1.Lines.Count);
+end;
+
+procedure TfrmUIDemo.process_new_weather_data(Sender: TObject);
+begin
+     Label1.Text:= 'Got New Data from Thread';
+end;
+
+{ TWeatherReaderThread }
+
+constructor TWeatherReaderThread.create(_CityLocation: string; _Memo: TMemo;
+                        _RESTClient: TRESTClient;_RESTRequest: TRESTRequest; _RESTResponse: TRESTResponse);
+begin
+   RESTClient:= _RESTClient;
+   RESTRequest:= _RESTRequest;
+   RESTResponse:= _RESTResponse;
+   CityLocation:= _CityLocation;
+   Memo:=    _Memo;
+   inherited Create(true);
+end;
+
+procedure TWeatherReaderThread.Execute;
+begin
+  RESTClient.BaseURL :=
+     'http://api.openweathermap.org/data/2.5/weather?q='+CityLocation+'&units=metric&APPID=24fdfebe24ee484cd7d2081c74b3bba5';
+  RESTRequest.Resource := '';
+  RESTRequest.Execute;
+  JSONData:= RESTResponse.Content;
+  Synchronize(writeToMainThread);
+end;
+
+procedure TWeatherReaderThread.writeToMainThread;
+begin
+  Memo.Lines.Clear;
+  Memo.Lines.Add(JSONData);
 end;
 
 end.

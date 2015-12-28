@@ -71,14 +71,14 @@ object frmUIDemo: TfrmUIDemo
     Size.Width = 557.000000000000000000
     Size.Height = 426.000000000000000000
     Size.PlatformDefault = False
-    TabIndex = 0
+    TabIndex = 1
     TabOrder = 4
     TabPosition = PlatformDefault
     object tiWeather: TTabItem
       CustomIcon = <
         item
         end>
-      IsSelected = True
+      IsSelected = False
       Size.Width = 65.000000000000000000
       Size.Height = 26.000000000000000000
       Size.PlatformDefault = False
@@ -326,7 +326,7 @@ object frmUIDemo: TfrmUIDemo
       CustomIcon = <
         item
         end>
-      IsSelected = False
+      IsSelected = True
       Size.Width = 55.000000000000000000
       Size.Height = 26.000000000000000000
       Size.PlatformDefault = False
@@ -339,18 +339,19 @@ object frmUIDemo: TfrmUIDemo
         Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
         DataDetectorTypes = []
         TextSettings.WordWrap = True
+        OnChange = Memo1Change
         Align = Client
         ControlType = Platform
         Margins.Left = 10.000000000000000000
         Margins.Top = 10.000000000000000000
         Margins.Right = 10.000000000000000000
         Margins.Bottom = 10.000000000000000000
-        Size.Width = 30.000000000000000000
-        Size.Height = 30.000000000000000000
+        Size.Width = 517.000000000000000000
+        Size.Height = 360.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 1
-        Viewport.Width = 26.000000000000000000
-        Viewport.Height = 26.000000000000000000
+        Viewport.Width = 513.000000000000000000
+        Viewport.Height = 356.000000000000000000
       end
     end
   end
@@ -553,8 +554,8 @@ object frmUIDemo: TfrmUIDemo
       'fdfebe24ee484cd7d2081c74b3bba5'
     Params = <>
     HandleRedirects = True
-    Left = 208
-    Top = 204
+    Left = 216
+    Top = 244
   end
   object RESTRequest: TRESTRequest
     Client = RESTClient

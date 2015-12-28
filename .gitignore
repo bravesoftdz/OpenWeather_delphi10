@@ -11,3 +11,7 @@ Android/
 *.o
 *.~*
 *.exe
+*.gz
+Images/weather_14.json.gz
+Win64/Debug/OpenWeatherDelphi.rsm
+*.dll
