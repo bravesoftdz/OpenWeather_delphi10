@@ -11,7 +11,7 @@ uses
   FMX.TabControl, FMX.ListBox, FMX.ListView.Types, FMX.ListView.Appearances,
   FMX.ListView.Adapters.Base, FMX.ListView, FMX.Objects, System.ImageList,
   FMX.ImgList, IdIOHandler, IdIOHandlerSocket, IdIOHandlerStack, IdSSL,
-  IdSSLOpenSSL;
+  IdSSLOpenSSL, System.Sensors, System.Sensors.Components;
 
 type
 
@@ -36,6 +36,7 @@ type
     Rectangle1: TRectangle;
     Label1: TLabel;
     IdHTTP1: TIdHTTP;
+    LocationSensor1: TLocationSensor;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure lbxWeatherDblClick(Sender: TObject);
@@ -45,7 +46,7 @@ type
     OnActivateDone: boolean;
     OpenWeatherData: TOpenWeatherData;
     procedure show_weather_data(Sender: TObject);
-    procedure get_new_new_weather_data(_location: string);
+    procedure get_new_new_weather_data(_url: string);
     procedure process_new_weather_data(Sender: TObject);
   public
   end;
@@ -54,14 +55,14 @@ type
   TWeatherReaderThread = class(TTHread)
     JSONData: string;
     WeatherData:  TOpenWeatherData;
-    CityLocation: string;
+    url: string;
     RESTClient: TRESTClient;
     RESTRequest: TRESTRequest;
     RESTResponse: TRESTResponse;
     function  get_utc_time: TDateTime;
     function get_local_time(_lat, _lon: string): TDateTime;
     procedure Execute; override;
-    constructor create (_CityLocation: string; _WeatherData: TOpenWeatherData;
+    constructor create (_url: string; _WeatherData: TOpenWeatherData;
                         _RESTClient: TRESTClient;_RESTRequest: TRESTRequest; _RESTResponse: TRESTResponse);
   end;
 
@@ -87,12 +88,18 @@ var _Item: TListViewItem;
     _ListItemImage: TListItemImage;
     _BitmapItem: TBitmapItem;
     _hoursAgo: double;
+    _idx: integer;
     //https://maps.googleapis.com/maps/api/timezone/json?location=-37.81,144.96&timestamp=0&key=AIzaSyB24zZQrfu8dNsF4sn2LIXa5glDiS9Q5Jk
 
 begin
   _hoursAgo:= (OpenWeatherData.local_time-  OpenWeatherData.last_updated) *24;
-  Memo1.Lines.Assign(OpenWeatherData.debug_text);
-  Memo1.Lines.Insert(0,'Local TIme: '+DateTimeToStr(OpenWeatherData.local_time));
+  Memo1.lines.Clear;
+  Memo1.Lines.Add(OpenWeatherData.url);
+  for _idx := 0 to OpenWeatherData.debug_text.Count-1 do
+     Memo1.Lines.Add(OpenWeatherData.debug_text[_idx]);
+
+  //Memo1.Lines.Assign(OpenWeatherData.debug_text);
+  //Memo1.Lines.Insert(0,'Local TIme: '+DateTimeToStr(OpenWeatherData.local_time));
   lbxWeather.Items.Clear;
   _Size.Width:= 24;
   _Size.Height:= 24;
@@ -117,6 +124,8 @@ begin
   if OpenWeatherData.icon = '50d' then  _BitMap:=  ImageList1.Bitmap(_Size,8 );
   if OpenWeatherData.icon = '50n' then  _BitMap:=  ImageList1.Bitmap(_Size,8 );
   imgWeather.Bitmap.Assign(_BitMap);;
+  _Item:= lbxWeather.Items.Add;
+  _Item.Text:= OpenWeatherData.name;
   _Item:= lbxWeather.Items.Add;
   _Item.Text:= OpenWeatherData.description;
   _Item:= lbxWeather.Items.Add;
@@ -149,12 +158,30 @@ procedure TfrmUIDemo.btnRefreshClick(Sender: TObject);
 //Melbourne,au
 //London,gb
 //Tokyo,jp
+//http://api.openweathermap.org/data/2.5/weather?lat=35&lon=139&APPID=24fdfebe24ee484cd7d2081c74b3bba5
+//'http://api.openweathermap.org/data/2.5/weather?q='+CityLocation+'&units=metric&APPID=24fdfebe24ee484cd7d2081c74b3bba5';
+var _url: string;
+    _cityLocation: string;
+    _GPSLocation: string;
 begin
      case cboLocation.ItemIndex of
-        0: get_new_new_weather_data('Melbourne,au');
-        1: get_new_new_weather_data('London,gb');
-        2: get_new_new_weather_data('Tokyo,jp');
+        0: begin
+             if LocationSensor1.Sensor.Latitude.IsNan() then
+                exit;
+             _cityLocation:= '';
+             _GPSLocation:= format('lat=%f&lon=%f',[LocationSensor1.Sensor.Latitude, LocationSensor1.Sensor.Longitude]);
+             _url:=  format('http://api.openweathermap.org/data/2.5/weather?%s&units=metric&APPID=24fdfebe24ee484cd7d2081c74b3bba5',
+                            [_GPSLocation]);
+             get_new_new_weather_data(_url);
+             exit;
+            end;
+        1: _cityLocation:= 'Melbourne,au';
+        2: _cityLocation:= 'London,gb';
+        3: _cityLocation:= 'Tokyo,jp';
      end;
+     _url:=  format('http://api.openweathermap.org/data/2.5/weather?q=%s&units=metric&APPID=24fdfebe24ee484cd7d2081c74b3bba5',
+                    [_cityLocation]);
+     get_new_new_weather_data(_url);
 end;
 
 procedure TfrmUIDemo.FormActivate(Sender: TObject);
@@ -179,10 +206,11 @@ begin
     //WeatherData.Free;
 end;
 
-procedure TfrmUIDemo.get_new_new_weather_data(_location: string);
+
+procedure TfrmUIDemo.get_new_new_weather_data(_url: string);
 var _WeatherReaderThread: TWeatherReaderThread;
 begin
-    _WeatherReaderThread:= TWeatherReaderThread.create(_location,OpenWeatherData,RESTClient,RESTRequest,RESTResponse);
+    _WeatherReaderThread:= TWeatherReaderThread.create(_url,OpenWeatherData,RESTClient,RESTRequest,RESTResponse);
     _WeatherReaderThread.OnTerminate:= process_new_weather_data;
     _WeatherReaderThread.FreeOnTerminate:= True;
     _WeatherReaderThread.Start;
@@ -284,21 +312,21 @@ end;
 
 
 
-constructor TWeatherReaderThread.create(_CityLocation: string; _WeatherData: TOpenWeatherData;
+constructor TWeatherReaderThread.create(_url: string; _WeatherData: TOpenWeatherData;
                         _RESTClient: TRESTClient;_RESTRequest: TRESTRequest; _RESTResponse: TRESTResponse);
 begin
    RESTClient:= _RESTClient;
    RESTRequest:= _RESTRequest;
    RESTResponse:= _RESTResponse;
-   CityLocation:= _CityLocation;
+   url:= _url;
    WeatherData:=    _WeatherData;
+   WeatherData.url:= url;
    inherited Create(true);
 end;
 
 procedure TWeatherReaderThread.Execute;
 begin
-  RESTClient.BaseURL :=
-     'http://api.openweathermap.org/data/2.5/weather?q='+CityLocation+'&units=metric&APPID=24fdfebe24ee484cd7d2081c74b3bba5';
+  RESTClient.BaseURL :=  url;
   RESTRequest.Resource := '';
   RESTRequest.Execute;
   JSONData:= RESTResponse.Content;

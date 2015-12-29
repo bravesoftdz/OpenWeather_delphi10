@@ -2,8 +2,8 @@ object frmUIDemo: TfrmUIDemo
   Left = 0
   Top = 0
   Caption = 'UI Demo'
-  ClientHeight = 534
-  ClientWidth = 549
+  ClientHeight = 551
+  ClientWidth = 552
   StyleLookup = 'panelstyle'
   FormFactor.Width = 320
   FormFactor.Height = 480
@@ -13,14 +13,14 @@ object frmUIDemo: TfrmUIDemo
   OnDestroy = FormDestroy
   DesignerMasterStyle = 0
   object ToolBar1: TToolBar
-    Size.Width = 549.000000000000000000
+    Size.Width = 552.000000000000000000
     Size.Height = 54.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 0
     object Layout3: TLayout
       Align = Right
       Margins.Right = 10.000000000000000000
-      Position.X = 489.000000000000000000
+      Position.X = 492.000000000000000000
       Size.Width = 50.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
@@ -40,7 +40,7 @@ object frmUIDemo: TfrmUIDemo
       Align = Client
       Fill.Color = claAzure
       HitTest = False
-      Size.Width = 489.000000000000000000
+      Size.Width = 492.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
       Stroke.Kind = None
@@ -68,8 +68,8 @@ object frmUIDemo: TfrmUIDemo
     Padding.Top = 10.000000000000000000
     Padding.Right = 10.000000000000000000
     Padding.Bottom = 10.000000000000000000
-    Size.Width = 549.000000000000000000
-    Size.Height = 480.000000000000000000
+    Size.Width = 552.000000000000000000
+    Size.Height = 497.000000000000000000
     Size.PlatformDefault = False
     TabIndex = 0
     TabOrder = 4
@@ -93,8 +93,8 @@ object frmUIDemo: TfrmUIDemo
         HeaderAppearanceClassName = 'TListHeaderObjects'
         FooterAppearanceClassName = 'TListHeaderObjects'
         Align = Client
-        Size.Width = 529.000000000000000000
-        Size.Height = 384.000000000000000000
+        Size.Width = 532.000000000000000000
+        Size.Height = 401.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 5
         StyleLookup = 'listviewstyle'
@@ -176,21 +176,22 @@ object frmUIDemo: TfrmUIDemo
       end
       object Layout1: TLayout
         Align = Top
-        Size.Width = 529.000000000000000000
+        Size.Width = 532.000000000000000000
         Size.Height = 50.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 6
         object cboLocation: TComboBox
           Align = Client
           Items.Strings = (
+            'Current Location'
             'Melbourne'
             'London'
             'Tokyo')
-          ItemIndex = 0
+          ItemIndex = 1
           Margins.Bottom = 10.000000000000000000
           Scale.X = 1.500000000000000000
           Scale.Y = 1.500000000000000000
-          Size.Width = 319.333343505859400000
+          Size.Width = 321.333343505859400000
           Size.Height = 23.333333969116210000
           Size.PlatformDefault = False
           TabOrder = 1
@@ -1273,5 +1274,10 @@ object frmUIDemo: TfrmUIDemo
     HTTPOptions = [hoForceEncodeParams]
     Left = 34
     Top = 172
+  end
+  object LocationSensor1: TLocationSensor
+    Active = True
+    Left = 442
+    Top = 220
   end
 end

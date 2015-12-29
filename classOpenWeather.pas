@@ -6,6 +6,7 @@ uses System.JSON, System.Classes, System.SysUtils;
 type
 
 TOpenWeatherData = class
+  url: string;
   name: string;
   country: string;
   cod: string;
