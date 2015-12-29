@@ -5,7 +5,7 @@ uses System.JSON, System.Classes, System.SysUtils;
 
 type
 
-TOpenWeatherItem = class
+TOpenWeatherData = class
   name: string;
   country: string;
   cod: string;
@@ -28,6 +28,7 @@ TOpenWeatherItem = class
   dt: string;
   last_updated: TDateTime;
   debug_text: TStringList;
+  local_time: TDateTime;
   procedure clear;
   procedure clean;
   function loadFromJsonData(_json_date: string): integer;
@@ -47,7 +48,7 @@ end;
 
 { TOpenWeatherItem }
 
-procedure TOpenWeatherItem.clean;
+procedure TOpenWeatherData.clean;
 begin
     name:= StringReplace(name, '"', '',[rfReplaceAll, rfIgnoreCase]);
     country:= StringReplace(country, '"', '',[rfReplaceAll, rfIgnoreCase]);
@@ -70,7 +71,7 @@ begin
     dt:= StringReplace(dt, '"', '',[rfReplaceAll, rfIgnoreCase]);
 end;
 
-procedure TOpenWeatherItem.clear;
+procedure TOpenWeatherData.clear;
 begin
   name:= '';
   country:= '';
@@ -92,25 +93,26 @@ begin
   sunset:= '';
   clouds:= '';
   dt:= '';
+  local_time:= 0;
 end;
 
 
 
 
 
-constructor TOpenWeatherItem.create;
+constructor TOpenWeatherData.create;
 begin
    inherited;
    debug_text:= TStringList.Create;
 end;
 
-destructor TOpenWeatherItem.destroy;
+destructor TOpenWeatherData.destroy;
 begin
     debug_text.Free;
     inherited;
 end;
 
-function TOpenWeatherItem.loadFromJsonData(_json_date: string): integer;
+function TOpenWeatherData.loadFromJsonData(_json_date: string): integer;
 var s: string;
     _JSONValue: TJSONValue;
     _JSONObject: TJSONObject;

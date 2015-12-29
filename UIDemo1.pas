@@ -15,10 +15,6 @@ uses
 
 type
 
-  TJsonDataFromThread = class(TObject)
-    json_data: string;
-  end;
-
   TfrmUIDemo = class(TForm)
     ToolBar1: TToolBar;
     Layout3: TLayout;
@@ -40,32 +36,32 @@ type
     Rectangle1: TRectangle;
     Label1: TLabel;
     IdHTTP1: TIdHTTP;
-    procedure btnRefreshClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure lbxWeatherDblClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
+    procedure btnRefreshClick(Sender: TObject);
   private
     OnActivateDone: boolean;
-    WeatherData: TJsonDataFromThread;
-    OpenWeatherItem: TOpenWeatherItem;
+    OpenWeatherData: TOpenWeatherData;
+    procedure show_weather_data(Sender: TObject);
+    procedure get_new_new_weather_data(_location: string);
     procedure process_new_weather_data(Sender: TObject);
-    function  get_utc_time: TDateTime;
-    function get_local_time(_lat, _lon: string): TDateTime;
   public
   end;
 
 
   TWeatherReaderThread = class(TTHread)
     JSONData: string;
-    WeatherData:  TJsonDataFromThread;
+    WeatherData:  TOpenWeatherData;
     CityLocation: string;
     RESTClient: TRESTClient;
     RESTRequest: TRESTRequest;
     RESTResponse: TRESTResponse;
-    procedure writeToMainThread;
+    function  get_utc_time: TDateTime;
+    function get_local_time(_lat, _lon: string): TDateTime;
     procedure Execute; override;
-    constructor create (_CityLocation: string; _WeatherData: TJsonDataFromThread;
+    constructor create (_CityLocation: string; _WeatherData: TOpenWeatherData;
                         _RESTClient: TRESTClient;_RESTRequest: TRESTRequest; _RESTResponse: TRESTResponse);
   end;
 
@@ -81,16 +77,145 @@ const
   sCaption = 'CA';
 
 
-function  TfrmUIDemo.get_utc_time: TDateTime;
+
+
+
+procedure TfrmUIDemo.show_weather_data(Sender: TObject);
+var _Item: TListViewItem;
+    _BitMap: TBitMap;
+    _Size: TSize;
+    _ListItemImage: TListItemImage;
+    _BitmapItem: TBitmapItem;
+    _hoursAgo: double;
+    //https://maps.googleapis.com/maps/api/timezone/json?location=-37.81,144.96&timestamp=0&key=AIzaSyB24zZQrfu8dNsF4sn2LIXa5glDiS9Q5Jk
+
+begin
+  _hoursAgo:= (OpenWeatherData.local_time-  OpenWeatherData.last_updated) *24;
+  Memo1.Lines.Assign(OpenWeatherData.debug_text);
+  Memo1.Lines.Insert(0,'Local TIme: '+DateTimeToStr(OpenWeatherData.local_time));
+  lbxWeather.Items.Clear;
+  _Size.Width:= 24;
+  _Size.Height:= 24;
+  _BitMap:=  ImageList1.Bitmap(_Size,0 );
+  OpenWeatherData.icon:= lowercase(OpenWeatherData.icon);
+  if OpenWeatherData.icon = '01d' then  _BitMap:=  ImageList1.Bitmap(_Size,0 );
+  if OpenWeatherData.icon = '01n' then  _BitMap:=  ImageList1.Bitmap(_Size,0 );
+  if OpenWeatherData.icon = '02d' then  _BitMap:=  ImageList1.Bitmap(_Size,1 );
+  if OpenWeatherData.icon = '02n' then  _BitMap:=  ImageList1.Bitmap(_Size,1 );
+  if OpenWeatherData.icon = '03d' then  _BitMap:=  ImageList1.Bitmap(_Size,2 );
+  if OpenWeatherData.icon = '03n' then  _BitMap:=  ImageList1.Bitmap(_Size,2 );
+  if OpenWeatherData.icon = '04d' then  _BitMap:=  ImageList1.Bitmap(_Size,3 );
+  if OpenWeatherData.icon = '04n' then  _BitMap:=  ImageList1.Bitmap(_Size,3 );
+  if OpenWeatherData.icon = '09d' then  _BitMap:=  ImageList1.Bitmap(_Size,4 );
+  if OpenWeatherData.icon = '09n' then  _BitMap:=  ImageList1.Bitmap(_Size,4 );
+  if OpenWeatherData.icon = '10d' then  _BitMap:=  ImageList1.Bitmap(_Size,5 );
+  if OpenWeatherData.icon = '10n' then  _BitMap:=  ImageList1.Bitmap(_Size,5 );
+  if OpenWeatherData.icon = '11d' then  _BitMap:=  ImageList1.Bitmap(_Size,6 );
+  if OpenWeatherData.icon = '11n' then  _BitMap:=  ImageList1.Bitmap(_Size,6 );
+  if OpenWeatherData.icon = '13d' then  _BitMap:=  ImageList1.Bitmap(_Size,7 );
+  if OpenWeatherData.icon = '13n' then  _BitMap:=  ImageList1.Bitmap(_Size,7 );
+  if OpenWeatherData.icon = '50d' then  _BitMap:=  ImageList1.Bitmap(_Size,8 );
+  if OpenWeatherData.icon = '50n' then  _BitMap:=  ImageList1.Bitmap(_Size,8 );
+  imgWeather.Bitmap.Assign(_BitMap);;
+  _Item:= lbxWeather.Items.Add;
+  _Item.Text:= OpenWeatherData.description;
+  _Item:= lbxWeather.Items.Add;
+  _Item.Text:= 'Current Temp: '+OpenWeatherData.temp;
+  _Item:= lbxWeather.Items.Add;
+  _Item.Text:= 'Wind Speed: '+OpenWeatherData.wind_speed;
+   _Item:= lbxWeather.Items.Add;
+  _Item.Text:= 'Humidity: '+OpenWeatherData.humidity;
+  _Item:= lbxWeather.Items.Add;
+  _Item.Text:= 'Local Time: '+FormatDateTime('dd/mm/yy hh:nn am/pm',OpenWeatherData.local_time);
+
+  _Item:= lbxWeather.Items.Add;
+  _Item.Text:= //' Last Update: '+FormatDateTime('dd/mm/yy hh:nn am/pm   ',OpenWeatherItem.last_updated)+
+               Format('Last Update %f hours ago',[_hoursAgo]);
+  _Item:= lbxWeather.Items.Add;
+  _Item.Text:= 'Lat: '+OpenWeatherData.lat;
+  _Item:= lbxWeather.Items.Add;
+  _Item.Text:= 'Lon: '+OpenWeatherData.lon;
+
+  //lbxWeather.Items.Add('Current Temp: '+OpenWeatherItem.temp);
+  //lbxWeather.Items.Add('Max Temp: '+OpenWeatherItem.temp_max);
+  //lbxWeather.Items.Add('Min Temp: '+OpenWeatherItem.temp_min);
+  //lbxWeather.Items.Add('Pressure: '+OpenWeatherItem.pressure);
+  //lbxWeather.Items.Add('Humidity: '+OpenWeatherItem.humidity);
+  //lbxWeather.Items.Add('Wind Direction: '+OpenWeatherItem.wind_deg);
+
+end;
+
+procedure TfrmUIDemo.btnRefreshClick(Sender: TObject);
+//Melbourne,au
+//London,gb
+//Tokyo,jp
+begin
+     case cboLocation.ItemIndex of
+        0: get_new_new_weather_data('Melbourne,au');
+        1: get_new_new_weather_data('London,gb');
+        2: get_new_new_weather_data('Tokyo,jp');
+     end;
+end;
+
+procedure TfrmUIDemo.FormActivate(Sender: TObject);
+var _WeatherReaderThread: TWeatherReaderThread;
+begin
+    if OnActivateDone then
+      exit;
+    OnActivateDone:= true;
+   btnRefreshClick(Sender);
+end;
+
+procedure TfrmUIDemo.FormCreate(Sender: TObject);
+begin
+  OnActivateDone:= false;
+  //WeatherData:= TJsonDataFromThread.Create;
+  OpenWeatherData:= TOpenWeatherData.Create;
+end;
+
+procedure TfrmUIDemo.FormDestroy(Sender: TObject);
+begin
+    OpenWeatherData.Free;
+    //WeatherData.Free;
+end;
+
+procedure TfrmUIDemo.get_new_new_weather_data(_location: string);
+var _WeatherReaderThread: TWeatherReaderThread;
+begin
+    _WeatherReaderThread:= TWeatherReaderThread.create(_location,OpenWeatherData,RESTClient,RESTRequest,RESTResponse);
+    _WeatherReaderThread.OnTerminate:= process_new_weather_data;
+    _WeatherReaderThread.FreeOnTerminate:= True;
+    _WeatherReaderThread.Start;
+end;
+
+procedure TfrmUIDemo.lbxWeatherDblClick(Sender: TObject);
+begin
+  TabControl1.ActiveTab:= tiDebug;
+end;
+
+
+
+procedure TfrmUIDemo.process_new_weather_data(Sender: TObject);
+begin
+    // Memo1.Lines.Clear;
+    // Memo1.Lines.Add('Done');
+    // Memo1.Lines.Add('Name: '+OpenWeatherData.name);
+     show_weather_data(sender);
+     //show_weather_data(sender);
+     //Label1.Text:= 'Got New Data from Thread';
+//     Memo1.Lines.Clear;
+//     Memo1.Lines.Add(OpenWeatherData.name);
+end;
+
+{ TWeatherReaderThread }
+
+function  TWeatherReaderThread.get_utc_time: TDateTime;
 var
   Response: TStringStream;
   _UTC_Time, _url: string;
   _JSONObject: TJSONObject;
   _JSONPair: TJSONPair;
    _ParseResult: integer;
-  // http://www.timeapi.org/utc/now
-  // 2015-12-26T06:19:44+00:00
-  //'{"dateString":"2015-12-28T09:49:54+00:00"}'
 begin
   Result:= 0;
   //_UTC_Time := GetPage('http://www.timeapi.org/utc/now');
@@ -123,17 +248,7 @@ begin
   end;
 end;
 
-function TfrmUIDemo.get_local_time(_lat, _lon: string): TDateTime;
-//https://maps.googleapis.com/maps/api/timezone/json?location=-37.81,144.96&timestamp=0&key=AIzaSyB24zZQrfu8dNsF4sn2LIXa5glDiS9Q5Jk
-(*
-{
-   "dstOffset" : 3600,
-   "rawOffset" : 36000,
-   "status" : "OK",
-   "timeZoneId" : "Australia/Hobart",
-   "timeZoneName" : "Australian Eastern Daylight Time"
-}
-*)
+function TWeatherReaderThread.get_local_time(_lat, _lon: string): TDateTime;
 const ONE_SECOND = 1/24/60/60;
 var  _JSONObject: TJSONObject;
      _json_data: string;
@@ -168,144 +283,8 @@ begin
 end;
 
 
-procedure TfrmUIDemo.btnRefreshClick(Sender: TObject);
-var _responce: string;
-    _Item: TListViewItem;
-    _BitMap: TBitMap;
-    _Size: TSize;
-    _ListItemImage: TListItemImage;
-    _BitmapItem: TBitmapItem;
-    _localTime: TDateTime;
-    _hoursAgo: double;
-    //https://maps.googleapis.com/maps/api/timezone/json?location=-37.81,144.96&timestamp=0&key=AIzaSyB24zZQrfu8dNsF4sn2LIXa5glDiS9Q5Jk
 
-begin
-  case cboLocation.ItemIndex of
-    0: RESTClient.BaseURL := 'http://api.openweathermap.org/data/2.5/weather?q=Melbourne,au&units=metric&APPID=24fdfebe24ee484cd7d2081c74b3bba5';
-    1: RESTClient.BaseURL := 'http://api.openweathermap.org/data/2.5/weather?q=London,gb&units=metric&APPID=24fdfebe24ee484cd7d2081c74b3bba5';
-    2: RESTClient.BaseURL := 'http://api.openweathermap.org/data/2.5/weather?q=Tokyo,jp&units=metric&APPID=24fdfebe24ee484cd7d2081c74b3bba5';
-  else
-     exit;
-  end;
-
-  RESTRequest.Resource := '';
-  RESTRequest.Execute;
-  _responce:= RESTResponse.Content;
-
-  OpenWeatherItem.loadFromJsonData(_responce);
-  _localTime:= get_local_time(OpenWeatherItem.lat, OpenWeatherItem.lon);
-  _hoursAgo:= (_localTime-  OpenWeatherItem.last_updated) *24;
-  Memo1.Lines.Assign(OpenWeatherItem.debug_text);
-  Memo1.Lines.Insert(0,'Local TIme: '+DateTimeToStr(_localTime));
-  lbxWeather.Items.Clear;
-
- // _Item:= lbxWeather.Items.Add;
- // _Item.Text:= '            '+OpenWeatherItem.name;
-  _Size.Width:= 24;
-  _Size.Height:= 24;
-  _BitMap:=  ImageList1.Bitmap(_Size,0 );
-  OpenWeatherItem.icon:= lowercase(OpenWeatherItem.icon);
-  if OpenWeatherItem.icon = '01d' then  _BitMap:=  ImageList1.Bitmap(_Size,0 );
-  if OpenWeatherItem.icon = '01n' then  _BitMap:=  ImageList1.Bitmap(_Size,0 );
-  if OpenWeatherItem.icon = '02d' then  _BitMap:=  ImageList1.Bitmap(_Size,1 );
-  if OpenWeatherItem.icon = '02n' then  _BitMap:=  ImageList1.Bitmap(_Size,1 );
-  if OpenWeatherItem.icon = '03d' then  _BitMap:=  ImageList1.Bitmap(_Size,2 );
-  if OpenWeatherItem.icon = '03n' then  _BitMap:=  ImageList1.Bitmap(_Size,2 );
-  if OpenWeatherItem.icon = '04d' then  _BitMap:=  ImageList1.Bitmap(_Size,3 );
-  if OpenWeatherItem.icon = '04n' then  _BitMap:=  ImageList1.Bitmap(_Size,3 );
-  if OpenWeatherItem.icon = '09d' then  _BitMap:=  ImageList1.Bitmap(_Size,4 );
-  if OpenWeatherItem.icon = '09n' then  _BitMap:=  ImageList1.Bitmap(_Size,4 );
-  if OpenWeatherItem.icon = '10d' then  _BitMap:=  ImageList1.Bitmap(_Size,5 );
-  if OpenWeatherItem.icon = '10n' then  _BitMap:=  ImageList1.Bitmap(_Size,5 );
-  if OpenWeatherItem.icon = '11d' then  _BitMap:=  ImageList1.Bitmap(_Size,6 );
-  if OpenWeatherItem.icon = '11n' then  _BitMap:=  ImageList1.Bitmap(_Size,6 );
-  if OpenWeatherItem.icon = '13d' then  _BitMap:=  ImageList1.Bitmap(_Size,7 );
-  if OpenWeatherItem.icon = '13n' then  _BitMap:=  ImageList1.Bitmap(_Size,7 );
-  if OpenWeatherItem.icon = '50d' then  _BitMap:=  ImageList1.Bitmap(_Size,8 );
-  if OpenWeatherItem.icon = '50n' then  _BitMap:=  ImageList1.Bitmap(_Size,8 );
-  imgWeather.Bitmap.Assign(_BitMap);;
- // _BitMap.SaveToFile('C:\aaa\c.bmp');
- (*
-  _Item.BitmapRef := _BitMap;//imgCross.Bitmap;
-  _ListItemImage:=  (_Item.Objects.FindDrawable(sThumbNailName) as TListItemImage);
-   if _ListItemImage <> Nil then begin
-      _ListItemImage.OwnsBitmap := False;
-      _ListItemImage.Bitmap := _BitMap;//imgCross.Bitmap;
-   end;
-   *)
-  _Item:= lbxWeather.Items.Add;
-  _Item.Text:= OpenWeatherItem.description;
-  _Item:= lbxWeather.Items.Add;
-  _Item.Text:= 'Current Temp: '+OpenWeatherItem.temp;
-  _Item:= lbxWeather.Items.Add;
-  _Item.Text:= 'Wind Speed: '+OpenWeatherItem.wind_speed;
-   _Item:= lbxWeather.Items.Add;
-  _Item.Text:= 'Humidity: '+OpenWeatherItem.humidity;
-  _Item:= lbxWeather.Items.Add;
-  _Item.Text:= 'Local Time: '+FormatDateTime('dd/mm/yy hh:nn am/pm',_localTime);
-
-  _Item:= lbxWeather.Items.Add;
-  _Item.Text:= //' Last Update: '+FormatDateTime('dd/mm/yy hh:nn am/pm   ',OpenWeatherItem.last_updated)+
-               Format('Last Update %f hours ago',[_hoursAgo]);
-  _Item:= lbxWeather.Items.Add;
-  _Item.Text:= 'Lat: '+OpenWeatherItem.lat;
-  _Item:= lbxWeather.Items.Add;
-  _Item.Text:= 'Lon: '+OpenWeatherItem.lon;
-
-  //lbxWeather.Items.Add('Current Temp: '+OpenWeatherItem.temp);
-  //lbxWeather.Items.Add('Max Temp: '+OpenWeatherItem.temp_max);
-  //lbxWeather.Items.Add('Min Temp: '+OpenWeatherItem.temp_min);
-  //lbxWeather.Items.Add('Pressure: '+OpenWeatherItem.pressure);
-  //lbxWeather.Items.Add('Humidity: '+OpenWeatherItem.humidity);
-  //lbxWeather.Items.Add('Wind Direction: '+OpenWeatherItem.wind_deg);
-
-end;
-
-procedure TfrmUIDemo.FormActivate(Sender: TObject);
-var _WeatherReaderThread: TWeatherReaderThread;
-begin
-    if OnActivateDone then
-      exit;
-    OnActivateDone:= true;
-    _WeatherReaderThread:= TWeatherReaderThread.create('Melbourne,au',WeatherData,RESTClient,RESTRequest,RESTResponse);
-    _WeatherReaderThread.OnTerminate:= process_new_weather_data;
-    _WeatherReaderThread.Execute;
-    _WeatherReaderThread.Free;
-
-    //btnRefreshClick(Sender);
-    OnActivateDone:= true;
-end;
-
-procedure TfrmUIDemo.FormCreate(Sender: TObject);
-begin
-  OnActivateDone:= false;
-  WeatherData:= TJsonDataFromThread.Create;
-  OpenWeatherItem:= TOpenWeatherItem.Create;
-end;
-
-procedure TfrmUIDemo.FormDestroy(Sender: TObject);
-begin
-    OpenWeatherItem.Free;
-    WeatherData.Free;
-end;
-
-procedure TfrmUIDemo.lbxWeatherDblClick(Sender: TObject);
-begin
-  TabControl1.ActiveTab:= tiDebug;
-end;
-
-
-
-procedure TfrmUIDemo.process_new_weather_data(Sender: TObject);
-begin
-     Label1.Text:= 'Got New Data from Thread';
-     Memo1.Lines.Clear;
-     Memo1.Lines.Add(weatherdata.json_data);
-end;
-
-{ TWeatherReaderThread }
-
-constructor TWeatherReaderThread.create(_CityLocation: string; _WeatherData: TJsonDataFromThread;
+constructor TWeatherReaderThread.create(_CityLocation: string; _WeatherData: TOpenWeatherData;
                         _RESTClient: TRESTClient;_RESTRequest: TRESTRequest; _RESTResponse: TRESTResponse);
 begin
    RESTClient:= _RESTClient;
@@ -323,12 +302,10 @@ begin
   RESTRequest.Resource := '';
   RESTRequest.Execute;
   JSONData:= RESTResponse.Content;
-  Synchronize(writeToMainThread);
+  WeatherData.loadFromJsonData(JSONData);
+  WeatherData.local_time:=  get_local_time(WeatherData.lat, WeatherData.lon);
 end;
 
-procedure TWeatherReaderThread.writeToMainThread;
-begin
-  WeatherData.json_data:= JSONData;
-end;
+
 
 end.
