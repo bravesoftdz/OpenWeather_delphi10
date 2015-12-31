@@ -11,7 +11,14 @@ uses
   FMX.TabControl, FMX.ListBox, FMX.ListView.Types, FMX.ListView.Appearances,
   FMX.ListView.Adapters.Base, FMX.ListView, FMX.Objects, System.ImageList,
   FMX.ImgList, IdIOHandler, IdIOHandlerSocket, IdIOHandlerStack, IdSSL,
-  IdSSLOpenSSL, System.Sensors, System.Sensors.Components;
+  IdSSLOpenSSL, System.Sensors, System.Sensors.Components, FireDAC.Stan.Intf,
+  FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS,
+  FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
+  FireDAC.UI.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Phys,
+  FireDAC.Phys.SQLite, FireDAC.Phys.SQLiteDef, FireDAC.Stan.ExprFuncs,
+  FireDAC.FMXUI.Wait, Data.DB, FireDAC.Comp.Client, FireDAC.Comp.DataSet,
+  System.Rtti, System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.EngExt,
+  Fmx.Bind.DBEngExt, Data.Bind.DBScope, System.IOUtils;
 
 type
 
@@ -37,11 +44,39 @@ type
     Label1: TLabel;
     IdHTTP1: TIdHTTP;
     LocationSensor1: TLocationSensor;
+    tiLocations: TTabItem;
+    Layout2: TLayout;
+    Button1: TButton;
+    Edit1: TEdit;
+    ListView1: TListView;
+    CityListsTable: TFDQuery;
+    CityListsTableid: TIntegerField;
+    CityListsTablename: TWideMemoField;
+    CityListsTableCountry: TWideMemoField;
+    CityListsTablename_country: TWideStringField;
+    FDQuery1: TFDQuery;
+    FDQuery1CountryCode: TWideMemoField;
+    FDQuery1CommonName: TWideMemoField;
+    FDQuery1FormalName: TWideMemoField;
+    FDQuery1Type: TWideMemoField;
+    FDQuery1SubType: TWideMemoField;
+    FDQuery1Sovereignty: TWideMemoField;
+    FDQuery1Capital: TWideMemoField;
+    FDQuery1CurrencyCode: TWideMemoField;
+    FDQuery1Currency: TWideMemoField;
+    FDQuery1TelephoneCode: TWideMemoField;
+    qryWorker: TFDQuery;
+    FDConnection1: TFDConnection;
+    BindSourceDB1: TBindSourceDB;
+    BindingsList1: TBindingsList;
+    LinkFillControlToField1: TLinkFillControlToField;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure lbxWeatherDblClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure btnRefreshClick(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
+    procedure FDConnection1BeforeConnect(Sender: TObject);
   private
     OnActivateDone: boolean;
     OpenWeatherData: TOpenWeatherData;
@@ -182,6 +217,31 @@ begin
      _url:=  format('http://api.openweathermap.org/data/2.5/weather?q=%s&units=metric&APPID=24fdfebe24ee484cd7d2081c74b3bba5',
                     [_cityLocation]);
      get_new_new_weather_data(_url);
+end;
+
+procedure TfrmUIDemo.Button1Click(Sender: TObject);
+var _sql: string;
+    _searchStr: string;
+begin
+  _searchStr:= Trim(Edit1.Text);
+  if length(_searchStr) > 2 then begin
+    CityListsTable.Close;
+     _sql:=
+    'select city_list.*,concat(concat(city_list.name,'' - ''),country_codes.CommonName) as name_country  from city_list '+
+    'join country_codes on city_list.Country = country_codes.CountryCode '+
+    format('where name like ''%s%%'' ',[_searchStr])+ ' '+
+    'order by  name limit 50 ';
+    CityListsTable.Open(_sql);
+  end;
+
+end;
+
+procedure TfrmUIDemo.FDConnection1BeforeConnect(Sender: TObject);
+begin
+{$IF DEFINED(iOS) or DEFINED(ANDROID)}
+  FDConnection1.Params.Values['Database'] :=
+      System.IOUtils.TPath.Combine(System.IOUtils.TPath.GetDocumentsPath, 'OpenWeather.db');
+  {$ENDIF}
 end;
 
 procedure TfrmUIDemo.FormActivate(Sender: TObject);

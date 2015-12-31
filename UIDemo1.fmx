@@ -71,14 +71,14 @@ object frmUIDemo: TfrmUIDemo
     Size.Width = 552.000000000000000000
     Size.Height = 497.000000000000000000
     Size.PlatformDefault = False
-    TabIndex = 0
+    TabIndex = 1
     TabOrder = 4
     TabPosition = PlatformDefault
     object tiWeather: TTabItem
       CustomIcon = <
         item
         end>
-      IsSelected = True
+      IsSelected = False
       Size.Width = 65.000000000000000000
       Size.Height = 26.000000000000000000
       Size.PlatformDefault = False
@@ -93,8 +93,7 @@ object frmUIDemo: TfrmUIDemo
         HeaderAppearanceClassName = 'TListHeaderObjects'
         FooterAppearanceClassName = 'TListHeaderObjects'
         Align = Client
-        Size.Width = 532.000000000000000000
-        Size.Height = 401.000000000000000000
+        Size.Width = 50.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 5
         StyleLookup = 'listviewstyle'
@@ -176,7 +175,7 @@ object frmUIDemo: TfrmUIDemo
       end
       object Layout1: TLayout
         Align = Top
-        Size.Width = 532.000000000000000000
+        Size.Width = 50.000000000000000000
         Size.Height = 50.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 6
@@ -191,7 +190,6 @@ object frmUIDemo: TfrmUIDemo
           Margins.Bottom = 10.000000000000000000
           Scale.X = 1.500000000000000000
           Scale.Y = 1.500000000000000000
-          Size.Width = 321.333343505859400000
           Size.Height = 23.333333969116210000
           Size.PlatformDefault = False
           TabOrder = 1
@@ -321,6 +319,58 @@ object frmUIDemo: TfrmUIDemo
           Size.Height = 50.000000000000000000
           Size.PlatformDefault = False
         end
+      end
+    end
+    object tiLocations: TTabItem
+      CustomIcon = <
+        item
+        end>
+      IsSelected = True
+      Size.Width = 70.000000000000000000
+      Size.Height = 26.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = ''
+      TabOrder = 0
+      Text = 'Locations'
+      ExplicitSize.cx = 70.000000000000000000
+      ExplicitSize.cy = 26.000000000000000000
+      object Layout2: TLayout
+        Align = Top
+        Size.Width = 532.000000000000000000
+        Size.Height = 41.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 23
+        object Button1: TButton
+          Position.X = 181.000000000000000000
+          Position.Y = 8.000000000000000000
+          Size.Width = 33.000000000000000000
+          Size.Height = 22.000000000000000000
+          Size.PlatformDefault = False
+          StyleLookup = 'searchtoolbutton'
+          TabOrder = 0
+          Text = 'Button1'
+          OnClick = Button1Click
+        end
+        object Edit1: TEdit
+          Touch.InteractiveGestures = [LongTap, DoubleTap]
+          TabOrder = 1
+          Position.X = 9.000000000000000000
+          Position.Y = 8.000000000000000000
+          Size.Width = 169.000000000000000000
+          Size.Height = 22.000000000000000000
+          Size.PlatformDefault = False
+        end
+      end
+      object ListView1: TListView
+        ItemAppearanceClassName = 'TListItemAppearance'
+        ItemEditAppearanceClassName = 'TListItemShowCheckAppearance'
+        HeaderAppearanceClassName = 'TListHeaderObjects'
+        FooterAppearanceClassName = 'TListHeaderObjects'
+        Align = Client
+        Size.Width = 532.000000000000000000
+        Size.Height = 410.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 24
       end
     end
     object tiDebug: TTabItem
@@ -1279,5 +1329,145 @@ object frmUIDemo: TfrmUIDemo
     Active = True
     Left = 442
     Top = 220
+  end
+  object CityListsTable: TFDQuery
+    Connection = FDConnection1
+    SQL.Strings = (
+      'select city_list.*,'
+      
+        'concat(concat(city_list.name,'#39#39' - '#39#39'),country_codes.CommonName) ' +
+        'as name_country'
+      'from city_list'
+      
+        'join country_codes on city_list.Country = country_codes.CountryC' +
+        'ode'
+      'limit 100')
+    Left = 416
+    Top = 361
+    object CityListsTableid: TIntegerField
+      FieldName = 'id'
+      Origin = 'id'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+    end
+    object CityListsTablename: TWideMemoField
+      FieldName = 'name'
+      Origin = 'name'
+      BlobType = ftWideMemo
+    end
+    object CityListsTableCountry: TWideMemoField
+      FieldName = 'Country'
+      Origin = 'Country'
+      BlobType = ftWideMemo
+    end
+    object CityListsTablename_country: TWideStringField
+      AutoGenerateValue = arDefault
+      FieldName = 'name_country'
+      Origin = 'name_country'
+      ProviderFlags = []
+      ReadOnly = True
+      Size = 32767
+    end
+  end
+  object FDQuery1: TFDQuery
+    Connection = FDConnection1
+    SQL.Strings = (
+      'SELECT * FROM country_codes'
+      '')
+    Left = 232
+    Top = 359
+    object FDQuery1CountryCode: TWideMemoField
+      FieldName = 'CountryCode'
+      Origin = 'CountryCode'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      BlobType = ftWideMemo
+    end
+    object FDQuery1CommonName: TWideMemoField
+      FieldName = 'CommonName'
+      Origin = 'CommonName'
+      BlobType = ftWideMemo
+    end
+    object FDQuery1FormalName: TWideMemoField
+      FieldName = 'FormalName'
+      Origin = 'FormalName'
+      BlobType = ftWideMemo
+    end
+    object FDQuery1Type: TWideMemoField
+      FieldName = 'Type'
+      Origin = 'Type'
+      BlobType = ftWideMemo
+    end
+    object FDQuery1SubType: TWideMemoField
+      FieldName = 'SubType'
+      Origin = 'SubType'
+      BlobType = ftWideMemo
+    end
+    object FDQuery1Sovereignty: TWideMemoField
+      FieldName = 'Sovereignty'
+      Origin = 'Sovereignty'
+      BlobType = ftWideMemo
+    end
+    object FDQuery1Capital: TWideMemoField
+      FieldName = 'Capital'
+      Origin = 'Capital'
+      BlobType = ftWideMemo
+    end
+    object FDQuery1CurrencyCode: TWideMemoField
+      FieldName = 'CurrencyCode'
+      Origin = 'CurrencyCode'
+      BlobType = ftWideMemo
+    end
+    object FDQuery1Currency: TWideMemoField
+      FieldName = 'Currency'
+      Origin = 'Currency'
+      BlobType = ftWideMemo
+    end
+    object FDQuery1TelephoneCode: TWideMemoField
+      FieldName = 'TelephoneCode'
+      Origin = 'TelephoneCode'
+      BlobType = ftWideMemo
+    end
+  end
+  object qryWorker: TFDQuery
+    Connection = FDConnection1
+    SQL.Strings = (
+      'SELECT * FROM city_list '
+      'order by  name')
+    Left = 112
+    Top = 359
+  end
+  object FDConnection1: TFDConnection
+    Params.Strings = (
+      'DriverID=SQLite'
+      
+        'Database=C:\Users\jim\Documents\SQLite\sqlitestudio-3.0.7\SQLite' +
+        'Studio\OpenWeather.db'
+      'LockingMode=Normal')
+    LoginPrompt = False
+    BeforeConnect = FDConnection1BeforeConnect
+    Left = 312
+    Top = 360
+  end
+  object BindSourceDB1: TBindSourceDB
+    DataSet = CityListsTable
+    ScopeMappings = <>
+    Left = 264
+    Top = 264
+  end
+  object BindingsList1: TBindingsList
+    Methods = <>
+    OutputConverters = <>
+    Left = 20
+    Top = 5
+    object LinkFillControlToField1: TLinkFillControlToField
+      Category = 'Quick Bindings'
+      Control = ListView1
+      Track = True
+      FillDataSource = BindSourceDB1
+      FillDisplayFieldName = 'name_country'
+      AutoFill = True
+      FillExpressions = <>
+      FillHeaderExpressions = <>
+      FillBreakGroups = <>
+    end
   end
 end
