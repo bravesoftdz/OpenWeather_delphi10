@@ -175,10 +175,10 @@ object frmUIDemo: TfrmUIDemo
           Margins.Bottom = 2.000000000000000000
           Scale.X = 1.200000047683716000
           Scale.Y = 1.200000047683716000
-          Size.Width = 306.000000000000000000
+          Size.Width = 347.666656494140600000
           Size.Height = 38.499996185302730000
           Size.PlatformDefault = False
-          TabOrder = 2
+          TabOrder = 1
           OnChange = btnRefreshClick
         end
         object imgWeather: TImage
@@ -305,17 +305,6 @@ object frmUIDemo: TfrmUIDemo
           Size.Height = 51.000000000000000000
           Size.PlatformDefault = False
         end
-        object btnRefresh: TButton
-          Align = Right
-          Position.X = 422.000000000000000000
-          Size.Width = 50.000000000000000000
-          Size.Height = 51.000000000000000000
-          Size.PlatformDefault = False
-          StyleLookup = 'refreshtoolbutton'
-          TabOrder = 1
-          Text = 'btnTrash'
-          OnClick = btnRefreshClick
-        end
         object btnRemoveFromShortList: TButton
           Align = Right
           Margins.Left = 10.000000000000000000
@@ -323,7 +312,7 @@ object frmUIDemo: TfrmUIDemo
           Size.Width = 50.000000000000000000
           Size.Height = 51.000000000000000000
           Size.PlatformDefault = False
-          StyleLookup = 'deleteitembutton'
+          StyleLookup = 'trashtoolbutton'
           TabOrder = 0
           OnClick = btnRemoveFromShortListClick
         end
@@ -415,12 +404,12 @@ object frmUIDemo: TfrmUIDemo
         Margins.Top = 10.000000000000000000
         Margins.Right = 10.000000000000000000
         Margins.Bottom = 10.000000000000000000
-        Size.Width = 512.000000000000000000
-        Size.Height = 431.000000000000000000
+        Size.Width = 30.000000000000000000
+        Size.Height = 30.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 1
-        Viewport.Width = 508.000000000000000000
-        Viewport.Height = 427.000000000000000000
+        Viewport.Width = 26.000000000000000000
+        Viewport.Height = 26.000000000000000000
       end
     end
   end

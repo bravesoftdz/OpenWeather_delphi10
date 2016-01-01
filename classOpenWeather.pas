@@ -117,6 +117,37 @@ begin
     inherited;
 end;
 
+function Capitalise(s: string):string;
+var i: integer;
+begin
+  Result:= '';
+  s:= trim(s);
+  if s = '' then
+   exit;
+  {$IF  DEFINED(ANDROID)}
+  Result:=  UpperCase(s[0]);
+  for i := 1 to length(s) do begin
+    if s[i-1] = ' ' then
+      Result:=  Result+UpperCase(s[i])
+    else
+      Result:=  Result+s[i];
+  end;
+  {$ENDIF}
+  {$IF  NOT DEFINED(ANDROID)}
+  Result:=  UpperCase(s[1]);
+  for i := 2 to length(s) do begin
+    if s[i-1] = ' ' then
+      Result:=  Result+UpperCase(s[i])
+    else
+      Result:=  Result+s[i];
+  end;
+  {$ENDIF}
+
+
+end;
+
+
+
 function TOpenWeatherData.loadFromJsonData(_json_date: string): integer;
 var s: string;
     _JSONValue: TJSONValue;
@@ -167,6 +198,8 @@ begin
       if _JSONPair <> Nil  then  id:=  _JSONPair.JSONValue.ToSTring;
       _JSONPair := _JSONObject.Get('temp');
       if _JSONPair <> Nil  then  temp:=  _JSONPair.JSONValue.ToSTring;
+     // if length(temp) > 1 then
+     //    system.Delete(temp,length(temp),1);
       _JSONPair := _JSONObject.Get('pressure');
       if _JSONPair <> Nil  then  pressure:=  _JSONPair.JSONValue.ToSTring;
       _JSONPair := _JSONObject.Get('humidity');
@@ -205,6 +238,7 @@ begin
       end;
 
        clean;
+        description:= Capitalise(description);
 
   finally
       _JSONObject.free;

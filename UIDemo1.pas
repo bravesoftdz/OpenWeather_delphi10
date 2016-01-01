@@ -18,7 +18,7 @@ uses
   FireDAC.Phys.SQLite, FireDAC.Phys.SQLiteDef, FireDAC.Stan.ExprFuncs,
   FireDAC.FMXUI.Wait, Data.DB, FireDAC.Comp.Client, FireDAC.Comp.DataSet,
   System.Rtti, System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.EngExt,
-  Fmx.Bind.DBEngExt, Data.Bind.DBScope, System.IOUtils, System.Generics.Collections;
+  Fmx.Bind.DBEngExt, Data.Bind.DBScope, System.IOUtils, System.Generics.Collections, Math;
 
 type
 
@@ -76,7 +76,6 @@ type
     CityListsTableSHORT_LIST: TBooleanField;
     LinkListControlToField1: TLinkListControlToField;
     btnAddToShortList: TButton;
-    btnRefresh: TButton;
     btnRemoveFromShortList: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -126,6 +125,12 @@ const
   sCaption = 'CA';
 
 
+function DistanceBetweenLonLat(const Lat1, Lon1, Lat2, Lon2: Extended): Extended;
+begin
+  Result := RadToDeg(ArcCos(Sin(DegToRad(Lat1))
+            * Sin(DegToRad(Lat2))
+            + Cos(DegToRad(Lat1)) * Cos(DegToRad(Lat2)) * Cos(DegToRad(Lon1 - Lon2)))) * 69.09;
+end;
 
 
 
@@ -137,6 +142,7 @@ var _Item: TListViewItem;
     _BitmapItem: TBitmapItem;
     _hoursAgo: double;
     _idx: integer;
+    _Distance: Extended;
     //https://maps.googleapis.com/maps/api/timezone/json?location=-37.81,144.96&timestamp=0&key=AIzaSyB24zZQrfu8dNsF4sn2LIXa5glDiS9Q5Jk
 
 begin
@@ -177,21 +183,28 @@ begin
   _Item:= lbxWeather.Items.Add;
   _Item.Text:= OpenWeatherData.description;
   _Item:= lbxWeather.Items.Add;
-  _Item.Text:= 'Current Temp: '+OpenWeatherData.temp;
+  _Item.Text:= 'Current Temp: '+OpenWeatherData.temp+' '+ char(176)+'C';
   _Item:= lbxWeather.Items.Add;
-  _Item.Text:= 'Wind Speed: '+OpenWeatherData.wind_speed;
+  _Item.Text:= 'Wind: '+OpenWeatherData.wind_speed+' km/h';
    _Item:= lbxWeather.Items.Add;
-  _Item.Text:= 'Humidity: '+OpenWeatherData.humidity;
+  _Item.Text:= 'Humidity: '+OpenWeatherData.humidity+'%';
+
+  if  not LocationSensor1.Sensor.Latitude.IsNan()  then begin
+      _Distance:=   DistanceBetweenLonLat(LocationSensor1.Sensor.Latitude, LocationSensor1.Sensor.Longitude,
+                    StrToFloat(OpenWeatherData.lat), StrToFloat(OpenWeatherData.lon));
+      _Item:= lbxWeather.Items.Add;
+      _Item.Text:= Format('Distance: %s km.',[FormatCurr('#,##0',_Distance)])
+  end;
   _Item:= lbxWeather.Items.Add;
   _Item.Text:= 'Local Time: '+FormatDateTime('dd/mm/yy hh:nn am/pm',OpenWeatherData.local_time);
 
   _Item:= lbxWeather.Items.Add;
+  _Item.Text:= 'Lat: '+OpenWeatherData.lat+'  '+'Lon: '+OpenWeatherData.lon;
+
+  _Item:= lbxWeather.Items.Add;
   _Item.Text:= //' Last Update: '+FormatDateTime('dd/mm/yy hh:nn am/pm   ',OpenWeatherItem.last_updated)+
                Format('Last Update %f hours ago',[_hoursAgo]);
-  _Item:= lbxWeather.Items.Add;
-  _Item.Text:= 'Lat: '+OpenWeatherData.lat;
-  _Item:= lbxWeather.Items.Add;
-  _Item.Text:= 'Lon: '+OpenWeatherData.lon;
+
 
   //lbxWeather.Items.Add('Current Temp: '+OpenWeatherItem.temp);
   //lbxWeather.Items.Add('Max Temp: '+OpenWeatherItem.temp_max);
