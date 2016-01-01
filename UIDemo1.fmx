@@ -1,7 +1,7 @@
 object frmUIDemo: TfrmUIDemo
   Left = 0
   Top = 0
-  Caption = 'UI Demo'
+  Caption = 'Open Weather'
   ClientHeight = 551
   ClientWidth = 552
   StyleLookup = 'panelstyle'
@@ -27,12 +27,11 @@ object frmUIDemo: TfrmUIDemo
       Stroke.Kind = None
     end
     object Label1: TLabel
+      Align = Center
       AutoSize = True
       StyledSettings = [Family, Size, FontColor]
       Opacity = 0.500000000000000000
       Margins.Left = 10.000000000000000000
-      Position.X = 14.000000000000000000
-      Position.Y = 15.000000000000000000
       Scale.X = 1.399999976158142000
       Scale.Y = 1.399999976158142000
       Size.Width = 130.000000000000000000
@@ -54,16 +53,16 @@ object frmUIDemo: TfrmUIDemo
     Size.PlatformDefault = False
     TabIndex = 0
     TabOrder = 4
-    TabPosition = PlatformDefault
+    TabPosition = None
     object tiWeather: TTabItem
       CustomIcon = <
         item
         end>
       IsSelected = True
-      Size.Width = 65.000000000000000000
-      Size.Height = 26.000000000000000000
+      Size.Width = 8.000000000000000000
+      Size.Height = 8.000000000000000000
       Size.PlatformDefault = False
-      StyleLookup = ''
+      StyleLookup = 'tabitemstyle'
       TabOrder = 0
       Text = 'Weather'
       ExplicitSize.cx = 65.000000000000000000
@@ -75,7 +74,7 @@ object frmUIDemo: TfrmUIDemo
         FooterAppearanceClassName = 'TListHeaderObjects'
         Align = Client
         Size.Width = 532.000000000000000000
-        Size.Height = 400.000000000000000000
+        Size.Height = 426.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 5
         StyleLookup = 'listviewstyle'
@@ -173,12 +172,11 @@ object frmUIDemo: TfrmUIDemo
           Margins.Top = 2.000000000000000000
           Margins.Right = 2.000000000000000000
           Margins.Bottom = 2.000000000000000000
-          Scale.X = 1.200000047683716000
           Scale.Y = 1.200000047683716000
-          Size.Width = 347.666656494140600000
+          Size.Width = 358.000000000000000000
           Size.Height = 38.499996185302730000
           Size.PlatformDefault = False
-          TabOrder = 1
+          TabOrder = 2
           OnChange = btnRefreshClick
         end
         object imgWeather: TImage
@@ -313,8 +311,19 @@ object frmUIDemo: TfrmUIDemo
           Size.Height = 51.000000000000000000
           Size.PlatformDefault = False
           StyleLookup = 'trashtoolbutton'
-          TabOrder = 0
+          TabOrder = 1
           OnClick = btnRemoveFromShortListClick
+        end
+        object btnJumpTOAddLocations: TButton
+          Align = Right
+          Margins.Left = 10.000000000000000000
+          Position.X = 422.000000000000000000
+          Size.Width = 50.000000000000000000
+          Size.Height = 51.000000000000000000
+          Size.PlatformDefault = False
+          StyleLookup = 'addtoolbuttonbordered'
+          TabOrder = 0
+          OnClick = btnJumpTOAddLocationsClick
         end
       end
     end
@@ -323,8 +332,8 @@ object frmUIDemo: TfrmUIDemo
         item
         end>
       IsSelected = False
-      Size.Width = 90.000000000000000000
-      Size.Height = 26.000000000000000000
+      Size.Width = 8.000000000000000000
+      Size.Height = 8.000000000000000000
       Size.PlatformDefault = False
       StyleLookup = ''
       TabOrder = 0
@@ -339,20 +348,21 @@ object frmUIDemo: TfrmUIDemo
         TabOrder = 23
         object btnSearch: TButton
           Align = Right
+          Margins.Left = 10.000000000000000000
           Position.X = 456.000000000000000000
           Size.Width = 33.000000000000000000
           Size.Height = 51.000000000000000000
           Size.PlatformDefault = False
           StyleLookup = 'searchtoolbutton'
-          TabOrder = 1
+          TabOrder = 2
           Text = 'btnSearch'
           OnClick = btnSearchClick
         end
         object Edit1: TEdit
           Touch.InteractiveGestures = [LongTap, DoubleTap]
           Align = Client
-          TabOrder = 2
-          Size.Width = 456.000000000000000000
+          TabOrder = 3
+          Size.Width = 403.000000000000000000
           Size.Height = 51.000000000000000000
           Size.PlatformDefault = False
         end
@@ -367,6 +377,16 @@ object frmUIDemo: TfrmUIDemo
           TabOrder = 0
           OnClick = btnAddToShortListClick
         end
+        object Button1: TButton
+          Align = Left
+          Margins.Right = 10.000000000000000000
+          Size.Width = 33.000000000000000000
+          Size.Height = 51.000000000000000000
+          Size.PlatformDefault = False
+          StyleLookup = 'backtoolbutton'
+          TabOrder = 1
+          OnClick = Button1Click
+        end
       end
       object ListView1: TListView
         ItemAppearanceClassName = 'TListItemAppearance'
@@ -375,7 +395,7 @@ object frmUIDemo: TfrmUIDemo
         FooterAppearanceClassName = 'TListHeaderObjects'
         Align = Client
         Size.Width = 532.000000000000000000
-        Size.Height = 400.000000000000000000
+        Size.Height = 426.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 24
       end

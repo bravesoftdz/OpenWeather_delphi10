@@ -77,6 +77,8 @@ type
     LinkListControlToField1: TLinkListControlToField;
     btnAddToShortList: TButton;
     btnRemoveFromShortList: TButton;
+    btnJumpTOAddLocations: TButton;
+    Button1: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure lbxWeatherDblClick(Sender: TObject);
@@ -87,6 +89,8 @@ type
     procedure FDConnection1AfterConnect(Sender: TObject);
     procedure btnAddToShortListClick(Sender: TObject);
     procedure btnRemoveFromShortListClick(Sender: TObject);
+    procedure btnJumpTOAddLocationsClick(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
   private
     OnActivateDone: boolean;
     OpenWeatherData: TOpenWeatherData;
@@ -232,6 +236,11 @@ begin
    TabControl1.ActiveTab:= tiWeather;
 end;
 
+procedure TfrmUIDemo.btnJumpTOAddLocationsClick(Sender: TObject);
+begin
+    TabControl1.ActiveTab:= tiLocations;
+end;
+
 procedure TfrmUIDemo.btnRefreshClick(Sender: TObject);
 //Melbourne,au
 //London,gb
@@ -296,6 +305,11 @@ begin
     CityListsTable.Open(_sql);
   end;
 
+end;
+
+procedure TfrmUIDemo.Button1Click(Sender: TObject);
+begin
+    TabControl1.ActiveTab:= tiWeather;
 end;
 
 procedure TfrmUIDemo.FDConnection1AfterConnect(Sender: TObject);

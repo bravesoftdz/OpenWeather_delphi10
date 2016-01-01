@@ -142,8 +142,6 @@ begin
       Result:=  Result+s[i];
   end;
   {$ENDIF}
-
-
 end;
 
 
