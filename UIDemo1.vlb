@@ -1,144 +1,141 @@
 ﻿[RESTClient]
-Coordinates=460,10,70,69
+Coordinates=460,10,82,80
 
 [ToolBar1]
-Coordinates=411,364,58,33
-
-[btnRefresh]
-Coordinates=10,364,68,51
+Coordinates=750,470,67,36
 
 [RESTRequest]
-Coordinates=354,10,82,87
+Coordinates=354,10,96,102
 
 [tiWeather]
-Coordinates=331,364,61,33
+Coordinates=660,460,70,36
 
 [RESTResponse]
-Coordinates=10,10,91,285
+Coordinates=10,10,106,344
 
 [Memo1]
-Coordinates=682,10,49,51
+Coordinates=830,140,57,58
 
 [TabControl1]
-Coordinates=236,364,74,33
+Coordinates=560,450,85,36
 
 [tiDebug]
-Coordinates=167,364,52,33
-
-[Layout3]
-Coordinates=97,364,53,33
+Coordinates=440,430,59,36
 
 []
-Coordinates=568,1,82,33
+Coordinates=650,410,60,36
 Visible=True
 
 [ImageList1]
-Coordinates=51,314,68,33
+Coordinates=51,314,77,36
 
 [lbxWeather]
-Coordinates=120,141,89,195
+Coordinates=120,141,107,234
 
 [Edit1]
-Coordinates=120,71,40,51
+Coordinates=120,71,44,58
 
 [ListView1]
-Coordinates=247,1,89,141
+Coordinates=560,0,107,168
 Visible=True
 
 [cboLocation]
-Coordinates=257,161,84,123
+Coordinates=257,161,101,146
 
 [Label1]
-Coordinates=120,1,46,51
+Coordinates=120,1,53,58
 
 [Layout2]
-Coordinates=379,116,53,33
+Coordinates=379,116,60,36
 
 [imgCross]
-Coordinates=247,303,61,51
-
-[Button1]
-Coordinates=247,416,53,51
+Coordinates=820,400,69,58
 
 [tiLocations]
-Coordinates=379,168,69,33
+Coordinates=379,168,76,36
 
 [LocationSensor1]
-Coordinates=430,220,97,33
+Coordinates=430,220,111,36
 
 [imgArrow]
-Coordinates=98,453,62,51
+Coordinates=540,380,69,58
 
 [Layout1]
-Coordinates=379,272,53,33
+Coordinates=960,480,60,36
 
 [Rectangle1]
-Coordinates=379,324,69,33
+Coordinates=860,470,80,36
 
 [IdHTTP1]
-Coordinates=379,416,56,33
+Coordinates=379,416,66,36
 
 [imgWeather]
-Coordinates=167,453,73,51
+Coordinates=460,370,84,58
 
 [FDQuery1FormalName]
-Coordinates=568,80,125,33
+Coordinates=568,80,147,36
 
 [CityListsTable]
-Coordinates=590,140,84,33
+Coordinates=590,140,96,36
 Visible=False
 
 [FDQuery1CountryCode]
-Coordinates=568,132,128,33
+Coordinates=568,132,149,36
 
 [FDQuery1CurrencyCode]
-Coordinates=568,184,134,33
+Coordinates=568,184,156,36
 
 [FDQuery1SubType]
-Coordinates=474,272,107,33
+Coordinates=474,272,125,36
 
 [qryWorker]
-Coordinates=29,453,65,51
+Coordinates=810,300,74,58
 
 [CityListsTableid]
-Coordinates=179,505,93,33
+Coordinates=179,505,106,36
 
 [CityListsTablename_country]
-Coordinates=619,236,155,33
+Coordinates=619,236,177,36
 
 [FDQuery1Sovereignty]
-Coordinates=619,288,122,33
+Coordinates=619,288,142,36
 
 [FDQuery1Currency]
-Coordinates=474,324,108,33
+Coordinates=474,324,126,36
 
 [CityListsTablename]
-Coordinates=474,376,111,33
+Coordinates=474,376,128,36
 
 [FDQuery1Capital]
-Coordinates=80,505,97,33
+Coordinates=80,505,114,36
 
 [FDQuery1Type]
-Coordinates=623,340,87,33
+Coordinates=623,340,102,36
 
 [FDConnection1]
-Coordinates=623,392,90,33
+Coordinates=623,392,104,36
 
 [CityListsTableCountry]
-Coordinates=623,444,124,33
+Coordinates=623,444,141,36
 
 [FDQuery1CommonName]
-Coordinates=623,496,136,33
+Coordinates=623,496,159,36
 
 [FDQuery1]
-Coordinates=278,486,79,231
+Coordinates=260,370,95,278
 
 [FDQuery1TelephoneCode]
-Coordinates=812,1,140,33
+Coordinates=812,1,165,36
 
 [BindSourceDB1]
-Coordinates=590,140,92,141
+Coordinates=670,180,106,190
 
 [BindingsList1]
-Coordinates=31,314,82,33
+Coordinates=31,314,91,36
+
+[CityListsTableSHORT_LIST]
+Coordinates=448,460,174,36
+
+[btnSearch]
+Coordinates=760,400,59,58
 

@@ -17,30 +17,11 @@ object frmUIDemo: TfrmUIDemo
     Size.Height = 54.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 0
-    object Layout3: TLayout
-      Align = Right
-      Margins.Right = 10.000000000000000000
-      Position.X = 492.000000000000000000
-      Size.Width = 50.000000000000000000
-      Size.Height = 54.000000000000000000
-      Size.PlatformDefault = False
-      TabOrder = 1
-      object btnRefresh: TButton
-        Align = Right
-        Size.Width = 50.000000000000000000
-        Size.Height = 54.000000000000000000
-        Size.PlatformDefault = False
-        StyleLookup = 'refreshtoolbutton'
-        TabOrder = 0
-        Text = 'btnTrash'
-        OnClick = btnRefreshClick
-      end
-    end
     object Rectangle1: TRectangle
       Align = Client
       Fill.Color = claAzure
       HitTest = False
-      Size.Width = 492.000000000000000000
+      Size.Width = 552.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
       Stroke.Kind = None
@@ -71,14 +52,14 @@ object frmUIDemo: TfrmUIDemo
     Size.Width = 552.000000000000000000
     Size.Height = 497.000000000000000000
     Size.PlatformDefault = False
-    TabIndex = 1
+    TabIndex = 0
     TabOrder = 4
     TabPosition = PlatformDefault
     object tiWeather: TTabItem
       CustomIcon = <
         item
         end>
-      IsSelected = False
+      IsSelected = True
       Size.Width = 65.000000000000000000
       Size.Height = 26.000000000000000000
       Size.PlatformDefault = False
@@ -93,7 +74,8 @@ object frmUIDemo: TfrmUIDemo
         HeaderAppearanceClassName = 'TListHeaderObjects'
         FooterAppearanceClassName = 'TListHeaderObjects'
         Align = Client
-        Size.Width = 50.000000000000000000
+        Size.Width = 532.000000000000000000
+        Size.Height = 400.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 5
         StyleLookup = 'listviewstyle'
@@ -175,8 +157,8 @@ object frmUIDemo: TfrmUIDemo
       end
       object Layout1: TLayout
         Align = Top
-        Size.Width = 50.000000000000000000
-        Size.Height = 50.000000000000000000
+        Size.Width = 532.000000000000000000
+        Size.Height = 51.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 6
         object cboLocation: TComboBox
@@ -187,12 +169,16 @@ object frmUIDemo: TfrmUIDemo
             'London'
             'Tokyo')
           ItemIndex = 1
-          Margins.Bottom = 10.000000000000000000
-          Scale.X = 1.500000000000000000
-          Scale.Y = 1.500000000000000000
-          Size.Height = 23.333333969116210000
+          Margins.Left = 2.000000000000000000
+          Margins.Top = 2.000000000000000000
+          Margins.Right = 2.000000000000000000
+          Margins.Bottom = 2.000000000000000000
+          Scale.X = 1.200000047683716000
+          Scale.Y = 1.200000047683716000
+          Size.Width = 306.000000000000000000
+          Size.Height = 38.499996185302730000
           Size.PlatformDefault = False
-          TabOrder = 1
+          TabOrder = 2
           OnChange = btnRefreshClick
         end
         object imgWeather: TImage
@@ -316,8 +302,30 @@ object frmUIDemo: TfrmUIDemo
             end>
           Align = Left
           Size.Width = 50.000000000000000000
-          Size.Height = 50.000000000000000000
+          Size.Height = 51.000000000000000000
           Size.PlatformDefault = False
+        end
+        object btnRefresh: TButton
+          Align = Right
+          Position.X = 422.000000000000000000
+          Size.Width = 50.000000000000000000
+          Size.Height = 51.000000000000000000
+          Size.PlatformDefault = False
+          StyleLookup = 'refreshtoolbutton'
+          TabOrder = 1
+          Text = 'btnTrash'
+          OnClick = btnRefreshClick
+        end
+        object btnRemoveFromShortList: TButton
+          Align = Right
+          Margins.Left = 10.000000000000000000
+          Position.X = 482.000000000000000000
+          Size.Width = 50.000000000000000000
+          Size.Height = 51.000000000000000000
+          Size.PlatformDefault = False
+          StyleLookup = 'deleteitembutton'
+          TabOrder = 0
+          OnClick = btnRemoveFromShortListClick
         end
       end
     end
@@ -325,7 +333,7 @@ object frmUIDemo: TfrmUIDemo
       CustomIcon = <
         item
         end>
-      IsSelected = True
+      IsSelected = False
       Size.Width = 70.000000000000000000
       Size.Height = 26.000000000000000000
       Size.PlatformDefault = False
@@ -337,28 +345,38 @@ object frmUIDemo: TfrmUIDemo
       object Layout2: TLayout
         Align = Top
         Size.Width = 532.000000000000000000
-        Size.Height = 41.000000000000000000
+        Size.Height = 51.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 23
-        object Button1: TButton
-          Position.X = 181.000000000000000000
-          Position.Y = 8.000000000000000000
+        object btnSearch: TButton
+          Align = Right
+          Position.X = 456.000000000000000000
           Size.Width = 33.000000000000000000
-          Size.Height = 22.000000000000000000
+          Size.Height = 51.000000000000000000
           Size.PlatformDefault = False
           StyleLookup = 'searchtoolbutton'
-          TabOrder = 0
-          Text = 'Button1'
-          OnClick = Button1Click
+          TabOrder = 1
+          Text = 'btnSearch'
+          OnClick = btnSearchClick
         end
         object Edit1: TEdit
           Touch.InteractiveGestures = [LongTap, DoubleTap]
-          TabOrder = 1
-          Position.X = 9.000000000000000000
-          Position.Y = 8.000000000000000000
-          Size.Width = 169.000000000000000000
-          Size.Height = 22.000000000000000000
+          Align = Client
+          TabOrder = 2
+          Size.Width = 456.000000000000000000
+          Size.Height = 51.000000000000000000
           Size.PlatformDefault = False
+        end
+        object btnAddToShortList: TButton
+          Align = Right
+          Margins.Left = 10.000000000000000000
+          Position.X = 499.000000000000000000
+          Size.Width = 33.000000000000000000
+          Size.Height = 51.000000000000000000
+          Size.PlatformDefault = False
+          StyleLookup = 'additembutton'
+          TabOrder = 0
+          OnClick = btnAddToShortListClick
         end
       end
       object ListView1: TListView
@@ -368,7 +386,7 @@ object frmUIDemo: TfrmUIDemo
         FooterAppearanceClassName = 'TListHeaderObjects'
         Align = Client
         Size.Width = 532.000000000000000000
-        Size.Height = 410.000000000000000000
+        Size.Height = 400.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 24
       end
@@ -384,6 +402,7 @@ object frmUIDemo: TfrmUIDemo
       StyleLookup = ''
       TabOrder = 0
       Text = 'Debug'
+      Visible = False
       ExplicitSize.cx = 55.000000000000000000
       ExplicitSize.cy = 26.000000000000000000
       object Memo1: TMemo
@@ -396,12 +415,12 @@ object frmUIDemo: TfrmUIDemo
         Margins.Top = 10.000000000000000000
         Margins.Right = 10.000000000000000000
         Margins.Bottom = 10.000000000000000000
-        Size.Width = 30.000000000000000000
-        Size.Height = 30.000000000000000000
+        Size.Width = 512.000000000000000000
+        Size.Height = 431.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 1
-        Viewport.Width = 26.000000000000000000
-        Viewport.Height = 26.000000000000000000
+        Viewport.Width = 508.000000000000000000
+        Viewport.Height = 427.000000000000000000
       end
     end
   end
@@ -1367,6 +1386,10 @@ object frmUIDemo: TfrmUIDemo
       ReadOnly = True
       Size = 32767
     end
+    object CityListsTableSHORT_LIST: TBooleanField
+      FieldName = 'SHORT_LIST'
+      Origin = 'SHORT_LIST'
+    end
   end
   object FDQuery1: TFDQuery
     Connection = FDConnection1
@@ -1443,6 +1466,7 @@ object frmUIDemo: TfrmUIDemo
         'Studio\OpenWeather.db'
       'LockingMode=Normal')
     LoginPrompt = False
+    AfterConnect = FDConnection1AfterConnect
     BeforeConnect = FDConnection1BeforeConnect
     Left = 312
     Top = 360
@@ -1450,21 +1474,19 @@ object frmUIDemo: TfrmUIDemo
   object BindSourceDB1: TBindSourceDB
     DataSet = CityListsTable
     ScopeMappings = <>
-    Left = 264
-    Top = 264
+    Left = 336
+    Top = 280
   end
   object BindingsList1: TBindingsList
     Methods = <>
     OutputConverters = <>
     Left = 20
     Top = 5
-    object LinkFillControlToField1: TLinkFillControlToField
+    object LinkListControlToField1: TLinkListControlToField
       Category = 'Quick Bindings'
+      DataSource = BindSourceDB1
+      FieldName = 'name_country'
       Control = ListView1
-      Track = True
-      FillDataSource = BindSourceDB1
-      FillDisplayFieldName = 'name_country'
-      AutoFill = True
       FillExpressions = <>
       FillHeaderExpressions = <>
       FillBreakGroups = <>

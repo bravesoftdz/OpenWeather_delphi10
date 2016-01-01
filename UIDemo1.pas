@@ -18,14 +18,18 @@ uses
   FireDAC.Phys.SQLite, FireDAC.Phys.SQLiteDef, FireDAC.Stan.ExprFuncs,
   FireDAC.FMXUI.Wait, Data.DB, FireDAC.Comp.Client, FireDAC.Comp.DataSet,
   System.Rtti, System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.EngExt,
-  Fmx.Bind.DBEngExt, Data.Bind.DBScope, System.IOUtils;
+  Fmx.Bind.DBEngExt, Data.Bind.DBScope, System.IOUtils, System.Generics.Collections;
 
 type
 
+  TLocationItem = class
+    id: integer;
+    name: string;
+    country: string;
+  end;
+
   TfrmUIDemo = class(TForm)
     ToolBar1: TToolBar;
-    Layout3: TLayout;
-    btnRefresh: TButton;
     RESTClient: TRESTClient;
     RESTRequest: TRESTRequest;
     RESTResponse: TRESTResponse;
@@ -46,7 +50,7 @@ type
     LocationSensor1: TLocationSensor;
     tiLocations: TTabItem;
     Layout2: TLayout;
-    Button1: TButton;
+    btnSearch: TButton;
     Edit1: TEdit;
     ListView1: TListView;
     CityListsTable: TFDQuery;
@@ -69,17 +73,26 @@ type
     FDConnection1: TFDConnection;
     BindSourceDB1: TBindSourceDB;
     BindingsList1: TBindingsList;
-    LinkFillControlToField1: TLinkFillControlToField;
+    CityListsTableSHORT_LIST: TBooleanField;
+    LinkListControlToField1: TLinkListControlToField;
+    btnAddToShortList: TButton;
+    btnRefresh: TButton;
+    btnRemoveFromShortList: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure lbxWeatherDblClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure btnRefreshClick(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
+    procedure btnSearchClick(Sender: TObject);
     procedure FDConnection1BeforeConnect(Sender: TObject);
+    procedure FDConnection1AfterConnect(Sender: TObject);
+    procedure btnAddToShortListClick(Sender: TObject);
+    procedure btnRemoveFromShortListClick(Sender: TObject);
   private
     OnActivateDone: boolean;
     OpenWeatherData: TOpenWeatherData;
+    LocationList: TObjectList<TLocationItem>;
+    procedure load_short_list;
     procedure show_weather_data(Sender: TObject);
     procedure get_new_new_weather_data(_url: string);
     procedure process_new_weather_data(Sender: TObject);
@@ -160,7 +173,7 @@ begin
   if OpenWeatherData.icon = '50n' then  _BitMap:=  ImageList1.Bitmap(_Size,8 );
   imgWeather.Bitmap.Assign(_BitMap);;
   _Item:= lbxWeather.Items.Add;
-  _Item.Text:= OpenWeatherData.name;
+  _Item.Text:= OpenWeatherData.name+' - '+OpenWeatherData.country_name;
   _Item:= lbxWeather.Items.Add;
   _Item.Text:= OpenWeatherData.description;
   _Item:= lbxWeather.Items.Add;
@@ -189,6 +202,23 @@ begin
 
 end;
 
+procedure TfrmUIDemo.btnAddToShortListClick(Sender: TObject);
+begin
+   Memo1.Lines.Clear;
+   Memo1.Lines.Add(CityListsTable.FieldByName('name').asString);
+   qryWorker.Close;
+   qryWorker.SQL.Text:= 'update city_list set  short_list = 1 where id = :id ';
+   qryWorker.ParamByName('id').AsInteger:= CityListsTable.FieldByName('id').AsInteger;
+   qryWorker.ExecSQL;
+   qryWorker.Close;
+   load_short_list;
+   MessageDlg(CityListsTable.FieldByName('name').AsString+' has been added to your favourites',
+            System.UITypes.TMsgDlgType.mtInformation,
+            [System.UITypes.TMsgDlgBtn.mbOK],0,Nil);
+   cboLocation.ItemIndex:= cboLocation.Items.IndexOf(CityListsTable.FieldByName('name').AsString);
+   TabControl1.ActiveTab:= tiWeather;
+end;
+
 procedure TfrmUIDemo.btnRefreshClick(Sender: TObject);
 //Melbourne,au
 //London,gb
@@ -198,28 +228,47 @@ procedure TfrmUIDemo.btnRefreshClick(Sender: TObject);
 var _url: string;
     _cityLocation: string;
     _GPSLocation: string;
+    _LocationItem: TLocationItem;
 begin
-     case cboLocation.ItemIndex of
-        0: begin
-             if LocationSensor1.Sensor.Latitude.IsNan() then
+     if cboLocation.ItemIndex < 0 then
+       exit;
+     if cboLocation.ItemIndex = 0 then begin
+        if LocationSensor1.Sensor.Latitude.IsNan() then
                 exit;
-             _cityLocation:= '';
-             _GPSLocation:= format('lat=%f&lon=%f',[LocationSensor1.Sensor.Latitude, LocationSensor1.Sensor.Longitude]);
-             _url:=  format('http://api.openweathermap.org/data/2.5/weather?%s&units=metric&APPID=24fdfebe24ee484cd7d2081c74b3bba5',
-                            [_GPSLocation]);
-             get_new_new_weather_data(_url);
-             exit;
-            end;
-        1: _cityLocation:= 'Melbourne,au';
-        2: _cityLocation:= 'London,gb';
-        3: _cityLocation:= 'Tokyo,jp';
+         _cityLocation:= '';
+         _GPSLocation:= format('lat=%f&lon=%f',[LocationSensor1.Sensor.Latitude, LocationSensor1.Sensor.Longitude]);
+         _url:=  format('http://api.openweathermap.org/data/2.5/weather?%s&units=metric&APPID=24fdfebe24ee484cd7d2081c74b3bba5',
+                        [_GPSLocation]);
+         get_new_new_weather_data(_url);
+         exit;
      end;
+     _LocationItem:= TLocationItem(cboLocation.Items.Objects[cboLocation.ItemIndex]);
+     _cityLocation:= _LocationItem.name+','+_LocationItem.country;
      _url:=  format('http://api.openweathermap.org/data/2.5/weather?q=%s&units=metric&APPID=24fdfebe24ee484cd7d2081c74b3bba5',
                     [_cityLocation]);
      get_new_new_weather_data(_url);
 end;
 
-procedure TfrmUIDemo.Button1Click(Sender: TObject);
+procedure TfrmUIDemo.btnRemoveFromShortListClick(Sender: TObject);
+var _LocationItem: TLocationItem;
+    _Name: string;
+begin
+  if cboLocation.ItemIndex <=0 then
+    exit;
+  _LocationItem:= TLocationItem(cboLocation.Items.Objects[cboLocation.ItemIndex]);
+  _Name:= _LocationItem.name;
+  qryWorker.Close;
+  qryWorker.SQL.Text:= 'update city_list set  short_list = 0 where id = :id ';
+  qryWorker.ParamByName('id').AsInteger:= _LocationItem.id;
+  qryWorker.ExecSQL;
+  qryWorker.Close;
+  load_short_list;
+   MessageDlg(_Name+' has been removed from your favourites',
+            System.UITypes.TMsgDlgType.mtInformation,
+            [System.UITypes.TMsgDlgBtn.mbOK],0,Nil);
+end;
+
+procedure TfrmUIDemo.btnSearchClick(Sender: TObject);
 var _sql: string;
     _searchStr: string;
 begin
@@ -234,6 +283,11 @@ begin
     CityListsTable.Open(_sql);
   end;
 
+end;
+
+procedure TfrmUIDemo.FDConnection1AfterConnect(Sender: TObject);
+begin
+    load_short_list;
 end;
 
 procedure TfrmUIDemo.FDConnection1BeforeConnect(Sender: TObject);
@@ -258,11 +312,14 @@ begin
   OnActivateDone:= false;
   //WeatherData:= TJsonDataFromThread.Create;
   OpenWeatherData:= TOpenWeatherData.Create;
+  LocationList:=  TObjectList<TLocationItem>.Create(True);
+  FDConnection1.Open();
 end;
 
 procedure TfrmUIDemo.FormDestroy(Sender: TObject);
 begin
     OpenWeatherData.Free;
+    LocationList.Free;
     //WeatherData.Free;
 end;
 
@@ -283,12 +340,53 @@ end;
 
 
 
+procedure TfrmUIDemo.load_short_list;
+var _LocationItem: TLocationItem;
+    i: integer;
+begin
+    cboLocation.OnChange:= Nil;
+    LocationList.Clear;
+    qryWorker.Close;
+    qryWorker.Open('select * from city_list where short_list = 1 order by name');
+    while not qryWorker.Eof do begin
+      _LocationItem:= TLocationItem.Create;
+      _LocationItem.id:=  qryWorker.FieldByName('id').AsInteger;
+      _LocationItem.name:=  qryWorker.FieldByName('name').AsString;
+      _LocationItem.country:=  qryWorker.FieldByName('country').AsString;
+      LocationList.Add(_LocationItem);
+      qryWorker.Next;
+    end;
+    qryWorker.Close;
+    cboLocation.Items.Clear;
+    cboLocation.Items.Add('Current Location');
+    for i := 0 to LocationList.Count-1 do begin
+      _LocationItem:=  LocationList.Items[i];
+      if  _LocationItem = nil then
+        continue;
+       cboLocation.Items.AddObject(_LocationItem.name,_LocationItem);
+    end;
+    cboLocation.OnChange:= btnRefreshClick;
+end;
+
+
+
 procedure TfrmUIDemo.process_new_weather_data(Sender: TObject);
 begin
     // Memo1.Lines.Clear;
     // Memo1.Lines.Add('Done');
     // Memo1.Lines.Add('Name: '+OpenWeatherData.name);
-     show_weather_data(sender);
+    OpenWeatherData.country_name:= '';
+    qryWorker.Close;
+    qryWorker.SQL.Text:= 'select * from country_codes where CountryCode = :CountryCode';
+    qryWorker.ParamByName('CountryCode').AsString:= OpenWeatherData.country;
+    qryWorker.Open();;
+    if not (qryWorker.Eof and qryWorker.BOF) then   begin
+      OpenWeatherData.country_name:=  qryWorker.FieldByName('CommonName').AsString;
+      OpenWeatherData.country_capital:=  qryWorker.FieldByName('Capital').AsString;
+    end;
+    qryWorker.Close;
+
+    show_weather_data(sender);
      //show_weather_data(sender);
      //Label1.Text:= 'Got New Data from Thread';
 //     Memo1.Lines.Clear;

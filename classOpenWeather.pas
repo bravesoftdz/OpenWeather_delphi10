@@ -9,6 +9,8 @@ TOpenWeatherData = class
   url: string;
   name: string;
   country: string;
+  country_name: string;
+  country_capital: string;
   cod: string;
   id: string;
   temp: string;
@@ -76,6 +78,8 @@ procedure TOpenWeatherData.clear;
 begin
   name:= '';
   country:= '';
+  country_name:= '';
+  country_capital:= '';
   cod:= '';
   id:= '';
   temp:= '';
