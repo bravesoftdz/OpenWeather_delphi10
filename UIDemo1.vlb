@@ -1,9 +1,6 @@
 ﻿[RESTClient]
 Coordinates=460,10,82,80
 
-[ToolBar1]
-Coordinates=750,470,67,36
-
 [RESTRequest]
 Coordinates=354,10,96,102
 
@@ -23,7 +20,7 @@ Coordinates=560,450,85,36
 Coordinates=440,430,59,36
 
 []
-Coordinates=650,410,60,36
+Coordinates=257,161,101,146
 Visible=True
 
 [ImageList1]
@@ -32,18 +29,9 @@ Coordinates=51,314,77,36
 [lbxWeather]
 Coordinates=120,141,107,234
 
-[Edit1]
-Coordinates=120,71,44,58
-
 [ListView1]
 Coordinates=560,0,107,168
 Visible=True
-
-[cboLocation]
-Coordinates=257,161,101,146
-
-[Label1]
-Coordinates=120,1,53,58
 
 [Layout2]
 Coordinates=379,116,60,36
@@ -62,9 +50,6 @@ Coordinates=540,380,69,58
 
 [Layout1]
 Coordinates=960,480,60,36
-
-[Rectangle1]
-Coordinates=860,470,80,36
 
 [IdHTTP1]
 Coordinates=379,416,66,36

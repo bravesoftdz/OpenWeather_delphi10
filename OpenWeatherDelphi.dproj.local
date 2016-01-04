@@ -20,4 +20,5 @@
 	<ActiveMobileDevice>
 		<NoProfile iOSSimulator="iPhone5" Android="07ce7413018294a9"/>
 	</ActiveMobileDevice>
+	<BT_BuildType>AppStore</BT_BuildType>
 </BorlandProject>

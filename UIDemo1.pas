@@ -29,7 +29,6 @@ type
   end;
 
   TfrmUIDemo = class(TForm)
-    ToolBar1: TToolBar;
     RESTClient: TRESTClient;
     RESTRequest: TRESTRequest;
     RESTResponse: TRESTResponse;
@@ -42,16 +41,12 @@ type
     imgArrow: TImage;
     ImageList1: TImageList;
     Layout1: TLayout;
-    cboLocation: TComboBox;
     imgWeather: TImage;
-    Rectangle1: TRectangle;
-    Label1: TLabel;
     IdHTTP1: TIdHTTP;
     LocationSensor1: TLocationSensor;
     tiLocations: TTabItem;
     Layout2: TLayout;
     btnSearch: TButton;
-    Edit1: TEdit;
     ListView1: TListView;
     CityListsTable: TFDQuery;
     CityListsTableid: TIntegerField;
@@ -77,8 +72,13 @@ type
     LinkListControlToField1: TLinkListControlToField;
     btnAddToShortList: TButton;
     btnRemoveFromShortList: TButton;
-    btnJumpTOAddLocations: TButton;
-    Button1: TButton;
+    imgLocation: TImage;
+    Layout3: TLayout;
+    Edit1: TEdit;
+    Layout4: TLayout;
+    cboLocation: TComboBox;
+    Line1: TLine;
+    Line2: TLine;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure lbxWeatherDblClick(Sender: TObject);
@@ -89,8 +89,6 @@ type
     procedure FDConnection1AfterConnect(Sender: TObject);
     procedure btnAddToShortListClick(Sender: TObject);
     procedure btnRemoveFromShortListClick(Sender: TObject);
-    procedure btnJumpTOAddLocationsClick(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
   private
     OnActivateDone: boolean;
     OpenWeatherData: TOpenWeatherData;
@@ -236,11 +234,6 @@ begin
    TabControl1.ActiveTab:= tiWeather;
 end;
 
-procedure TfrmUIDemo.btnJumpTOAddLocationsClick(Sender: TObject);
-begin
-    TabControl1.ActiveTab:= tiLocations;
-end;
-
 procedure TfrmUIDemo.btnRefreshClick(Sender: TObject);
 //Melbourne,au
 //London,gb
@@ -251,12 +244,19 @@ var _url: string;
     _cityLocation: string;
     _GPSLocation: string;
     _LocationItem: TLocationItem;
+     _Item: TListViewItem;
 begin
      if cboLocation.ItemIndex < 0 then
        exit;
      if cboLocation.ItemIndex = 0 then begin
-        if LocationSensor1.Sensor.Latitude.IsNan() then
-                exit;
+        if LocationSensor1.Sensor.Latitude.IsNan() then begin
+            lbxWeather.Items.Clear;
+            _Item:= lbxWeather.Items.Add;
+            _Item.Text:= 'Could not get your current Location';
+            _Item:= lbxWeather.Items.Add;
+            _Item.Text:= 'Please try again in a few seconds...';
+            exit;
+        end;
          _cityLocation:= '';
          _GPSLocation:= format('lat=%f&lon=%f',[LocationSensor1.Sensor.Latitude, LocationSensor1.Sensor.Longitude]);
          _url:=  format('http://api.openweathermap.org/data/2.5/weather?%s&units=metric&APPID=24fdfebe24ee484cd7d2081c74b3bba5',
@@ -307,11 +307,6 @@ begin
 
 end;
 
-procedure TfrmUIDemo.Button1Click(Sender: TObject);
-begin
-    TabControl1.ActiveTab:= tiWeather;
-end;
-
 procedure TfrmUIDemo.FDConnection1AfterConnect(Sender: TObject);
 begin
     load_short_list;
@@ -337,6 +332,7 @@ end;
 procedure TfrmUIDemo.FormCreate(Sender: TObject);
 begin
   OnActivateDone:= false;
+//  TabControl1.TabPosition:= None;
   //WeatherData:= TJsonDataFromThread.Create;
   OpenWeatherData:= TOpenWeatherData.Create;
   LocationList:=  TObjectList<TLocationItem>.Create(True);
